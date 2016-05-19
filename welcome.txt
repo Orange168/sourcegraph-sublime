@@ -7,6 +7,6 @@ Sourcegraph Edge Sublime Plugin
 
 
 
-  To disable the browser auto-opening, please visit https://github.com/sourcegraph/sg-sublime#auto-process-selection.
+  To disable the browser auto-opening, please visit https://github.com/sourcegraph/sourcegraph-sublime#auto-process-selection.
   
-  For more details about usage, please visit: https://github.com/sourcegraph/sg-sublime.
+  For more details about usage, please visit: https://github.com/sourcegraph/sourcegraph-sublime.

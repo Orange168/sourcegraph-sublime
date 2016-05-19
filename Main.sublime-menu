@@ -17,7 +17,7 @@
 								"caption": "Settings – Default",
 								"command": "open_file",
 								"args": {
-									"file": "${packages}/sg-sublime/Sourcegraph.sublime-settings"
+									"file": "${packages}/sourcegraph-sublime/Sourcegraph.sublime-settings"
 								}
 							},
 							{
@@ -33,7 +33,7 @@
 								"platform": "Linux",
 								"command": "open_file",
 								"args": {
-									"file": "${packages}/sg-sublime/Default (Linux).sublime-keymap"
+									"file": "${packages}/sourcegraph-sublime/Default (Linux).sublime-keymap"
 								}
 							},
 							{
@@ -41,7 +41,7 @@
 								"platform": "Windows",
 								"command": "open_file",
 								"args": {
-									"file": "${packages}/sg-sublime/Default (Windows).sublime-keymap"
+									"file": "${packages}/sourcegraph-sublime/Default (Windows).sublime-keymap"
 								}
 							},
 							{
@@ -49,7 +49,7 @@
 								"platform": "OSX",
 								"command": "open_file",
 								"args": {
-									"file": "${packages}/sg-sublime/Default (OSX).sublime-keymap"
+									"file": "${packages}/sourcegraph-sublime/Default (OSX).sublime-keymap"
 								}
 							},
 							{ "caption": "-" },
@@ -57,7 +57,7 @@
 								"caption": "README",
 								"command": "open_file",
 								"args": {
-									"file": "${packages}/sg-sublime/README.md"
+									"file": "${packages}/sourcegraph-sublime/README.md"
 								}
 							},
 							{ "caption": "-" },

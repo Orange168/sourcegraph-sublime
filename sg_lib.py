@@ -32,9 +32,9 @@ class Error(object):
 	def __str__(self):
 		return "%s : %s" % (self.title, self.description)
 
-ERR_GOPATH_UNDEFINED = Error('GOPATH Undefined', 'Could not find GOPATH in your shell startup scripts or Sublime settings. Please read the GOPATH section in the Sourcegraph Edge README https://github.com/luttig/sg-sublime to learn how to set your GOPATH.')
-ERR_GODEFINFO_INSTALL = Error('godefinfo binary not found in your PATH', 'Please read the Installation section in the Sourcegraph Edge README https://github.com/luttig/sg-sublime to learn how to install godefinfo.')
-ERR_GO_BINARY = Error('Go binary not found in your PATH', 'Please read the GOBIN section in the Sourcegraph Edge README https://github.com/luttig/sg-sublime to learn how to set your GOBIN.')
+ERR_GOPATH_UNDEFINED = Error('GOPATH Undefined', 'Could not find GOPATH in your shell startup scripts or Sublime settings. Please read the GOPATH section in the Sourcegraph Edge README https://github.com/sourcegraph/sourcegraph-sublime to learn how to set your GOPATH.')
+ERR_GODEFINFO_INSTALL = Error('godefinfo binary not found in your PATH', 'Please read the Installation section in the Sourcegraph Edge README https://github.com/sourcegraph/sourcegraph-sublime to learn how to install godefinfo.')
+ERR_GO_BINARY = Error('Go binary not found in your PATH', 'Please read the GOBIN section in the Sourcegraph Edge README https://github.com/sourcegraph/sourcegraph-sublime to learn how to set your GOBIN.')
 ERR_GO_VERSION = Error('Go version is < 1.6', 'Sourcegraph Edge only works with Go 1.6 and greater.')
 ERR_UNRECOGNIZED_SHELL = Error('Sourcegraph for Sublime can\'t execute commands against your shell', 'Contact Sourcegraph with your OS details, and we\'ll try to deliver Sourcegraph Edge for your OS')
 
