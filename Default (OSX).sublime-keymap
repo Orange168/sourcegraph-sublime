@@ -1,0 +1,10 @@
+[
+    {
+		"keys": ["super+.", "super+0"],
+		"command": "sg_open_edge",
+	},
+	{
+		"keys": ["super+,", "super+0"],
+		"command": "sg_manual_process"
+	}
+]

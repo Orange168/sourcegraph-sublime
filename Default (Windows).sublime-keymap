@@ -1,0 +1,10 @@
+[
+    {
+		"keys": ["ctrl+.", "ctrl+0"],
+		"command": "sg_open_edge"
+	},
+	{
+		"keys": ["ctrl+,", "ctrl+0"],
+		"command": "sg_manual_process"
+	}
+]

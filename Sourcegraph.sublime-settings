@@ -1,0 +1,44 @@
+{
+	/*
+	This is where debugging information goes. To see debugging information in the
+	Sublime Console, set the "VERBOSE_LOGGING" setting to true.
+	*/
+	"SG_LOG_FILE": "/tmp/sourcegraph-sublime.log",
+
+	/*
+	This setting allows you to use channels on a local version of Sourcegraph.
+	*/
+	"SG_BASE_URL": "https://grpc-staging.sourcegraph.com",
+
+	/*
+	This setting auto-opens the Edge channel in your browser when you click on a
+	definition in Go. If it is set to false, then you can access the Edge channel
+	by clicking [ctrl+., ctrl+0].
+	*/
+	"AUTO_OPEN": true,
+
+	/*
+	This setting gives logs output from the Sourcegraph Edge plugin to the
+	Sublime Console, which can be helping when troubleshooting Sourcegraph Edge.
+
+	No logging: 0
+	Only log symbols identified by godef: 1
+	Log network calls: 2
+	Log all debugging information: 3
+	
+	*/
+	"LOG_LEVEL": 0,
+
+	/*
+	This setting looks for valid Go symbols if your cursor is near parentheses, which
+	makes the UX better when using auto-complete. Set to false if you want to only
+	use Sourcegraph Edge for symbols directly under the cursor.
+	*/
+	"ENABLE_LOOKBACK": true,
+
+	/*
+	This setting allows you to disable Sourcegraph's auto-processing feature. If you disable
+	it, you must press [ctrl+, , ctrl+0] to process your current selection on Sourcegraph.
+	*/
+	"AUTO_PROCESS": true
+}

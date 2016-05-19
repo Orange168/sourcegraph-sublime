@@ -1,0 +1,12 @@
+Sourcegraph Edge Sublime Plugin
+===============================
+
+  Thank you for installing the Sourcegraph Edge Sublime Plugin!
+
+  To begin using the plugin, open any Go file and click on a symbol.
+
+
+
+  To disable the browser auto-opening, please visit https://github.com/sourcegraph/sg-sublime#auto-process-selection.
+  
+  For more details about usage, please visit: https://github.com/sourcegraph/sg-sublime.
