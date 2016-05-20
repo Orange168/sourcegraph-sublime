@@ -42,7 +42,7 @@ def load_settings(settings):
 	if settings.has('GOBIN'):
 		sgedge_settings.GOBIN = settings.get('GOBIN').rstrip(os.sep)
 
-	shell_gopath, err, return_code = sg_lib.run_shell_command(sgedge_settings.ENV.get('SHELL'), "echo ${GOPATH}")
+	shell_gopath, err, return_code = sg_lib.run_native_shell_command(sgedge_settings.ENV.get('SHELL'), ['echo', '${GOPATH}'])
 	if settings.has('GOPATH'):
 		sgedge_settings.ENV['GOPATH'] = str(settings.get('GOPATH').rstrip(os.sep)).strip()
 		sg_lib.log_output('[settings] Using GOPATH found in Sublime settings file: %s' % sgedge_settings.ENV['GOPATH'])

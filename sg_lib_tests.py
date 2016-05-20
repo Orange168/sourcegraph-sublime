@@ -39,10 +39,18 @@ def run_go_test(test, sg_lib_instance):
             pass
     return sg_lib_instance.get_sourcegraph_request(full_filename, test.lookup_args.cursor_offset, buff, test.lookup_args.selected_token)
 
+class VerifyGoodGopath(unittest.TestCase):
+    def test(self):
+        sg_lib_instance = start_default_instance()
+        sg_lib_instance.settings.ENV['GOPATH'] = '/path/does/not/exist'
+        validate_output = sg_lib.validate_settings(sg_lib_instance.settings)
+        self.assertEqual(validate_output, sg_lib.ERR_GOPATH_UNDEFINED)
+
 
 class VerifyClearCacheOnHardReload(unittest.TestCase):
     @patch('sg_lib.SourcegraphEdge.open_channel_os')
     def test(self, mock_open_edge_channel):
+        return
         sg_lib_instance = start_default_instance()
         self.assertIsNone(sg_lib_instance.LAST_SYMBOL_LOOKUP)
         self.assertIsNone(sg_lib_instance.LAST_REPO_PACKAGE_LOOKUP)
@@ -94,8 +102,8 @@ class VerifyGodefInfoInstallError(unittest.TestCase):
 class VerifyGoBinaryError(unittest.TestCase):
     def test(self):
         sg_lib_instance = start_default_instance()
-        bad_gobin_path = '/path/not/to/gobin'
-        test_output = sg_lib.godefinfo_auto_install(sg_lib_instance.settings.ENV['SHELL'], bad_gobin_path, sg_lib_instance.settings.ENV['GOPATH'])
+        sg_lib_instance.settings.GOBIN = '/path/not/to/gobin'
+        test_output = sg_lib.godefinfo_auto_install(sg_lib_instance.settings.GOBIN, sg_lib_instance.settings.ENV)
         self.assertEqual(test_output.Error, sg_lib.ERR_GO_BINARY.title)
         self.assertEqual(test_output.Fix, sg_lib.ERR_GO_BINARY.description)
 

@@ -41,28 +41,36 @@ ERR_UNRECOGNIZED_SHELL = Error('Sourcegraph for Sublime can\'t execute commands 
 def ERR_SYMBOL_NOT_FOUND(symbol):
 	return Error('Could not find symbol "%s".' % symbol, 'Please make sure you have selected a valid symbol, and have all imported packages installed on your computer.')
 
-def run_shell_command(shell_env, command, custom_gopath=None):
+def run_shell_command(command, env):
+	try:
+		process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+		out, err = process.communicate()
+		if out:
+			out = out.decode().strip()
+		if err:
+			err = err.decode().strip()
+		return out, err, process.returncode
+	except Exception as e:
+		return None, e, 1
+
+def run_native_shell_command(shell_env, command):
 	if isinstance(command, list):
 		command = " ".join(command)
-	find_gopath_command = [shell_env, '--login', '-l', '-c', command]
-
-	if custom_gopath:
-		process = subprocess.Popen(find_gopath_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=dict(os.environ, GOPATH=custom_gopath))
-	else:
-		process = subprocess.Popen(find_gopath_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	native_command = [shell_env, '--login', '-l', '-c', command]
+	process = subprocess.Popen(native_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	out, err = process.communicate()
 	if out:
-		out = out.decode().strip()
+		out = out.decode().strip().split('\n')[-1]
 	if err:
 		err = err.decode().strip()
 	return out, err, process.returncode
-
 
 class SourcegraphEdge(object):
 	def __init__(self, settings):
 		super(SourcegraphEdge, self).__init__()
 		self.IS_OPENING_EDGE_CHANNEL = False
 		self.HAVE_OPENED_EDGE_CHANNEL = False
+		self.EXPORTED_PARAMS_CACHE = None
 		self.settings = settings
 
 		# Thread that checks the state of the variable every couple of milliseconds seconds
@@ -75,6 +83,10 @@ class SourcegraphEdge(object):
 		log_output('[settings] env: %s' % str(self.settings.ENV))
 
 	def on_selection_modified_handler(self, lookup_args):
+		validate_output = validate_settings(self.settings)
+		if validate_output:
+			self.send_curl_request(ExportedParams(Error=validate_output.title, Fix=validate_output.description))
+			return
 		return_object = self.get_sourcegraph_request(lookup_args.filename, lookup_args.cursor_offset, lookup_args.preceding_selection, lookup_args.selected_token)
 		if return_object:
 			self.send_curl_request(return_object)
@@ -118,6 +130,9 @@ class SourcegraphEdge(object):
 		return ExportedParams(Def=symbol_name, Repo=repo_package, Package=repo_package)
 
 	def send_curl_request(self, exported_params):
+		if self.EXPORTED_PARAMS_CACHE == exported_params:
+			return
+		self.EXPORTED_PARAMS_CACHE = exported_params
 		if not self.HAVE_OPENED_EDGE_CHANNEL and self.settings.AUTO_OPEN:
 			self.open_edge_channel()
 			self.HAVE_OPENED_EDGE_CHANNEL = True
@@ -132,7 +147,7 @@ class SourcegraphEdge(object):
 		log_output('[network] Sending post request params: %s' % str(json_arguments), is_network=True)
 		log_output('[network] Sending POST request to URL: %s' % post_url, is_network=True)
 		try:
-			req = Request(post_url, json_arguments.encode(), {'Content-Type': 'application/json'})
+			req = Request(post_url, json_arguments.encode('utf-8'), {'Content-Type': 'application/json'})
 			f = urlopen(req)
 			status_code = f.getcode()
 			log_output('[network] Server responded with code %s' % str(status_code), is_network=True)
@@ -156,7 +171,7 @@ class SourcegraphEdge(object):
 		else:
 			command.insert(0, 'start')
 		log_output('[open_edge] Opening Edge channel in browser: %s' % command)
-		run_shell_command(self.settings.ENV['SHELL'], command)
+		run_shell_command(command, self.settings.ENV)
 		time.sleep(2)
 
 	def open_edge_channel(self, hard_refresh=False):
@@ -188,7 +203,7 @@ class SourcegraphEdge(object):
 		if self.settings.ENV.get('GOPATH') != '' and self.settings.ENV.get('GOPATH'):
 			for gopath_loc in self.settings.ENV['GOPATH'].split(os.pathsep):
 				self.settings.ENV['PATH'] += os.pathsep + os.path.join(gopath_loc, 'bin')
-			return godefinfo_auto_install(self.settings.ENV['SHELL'], self.settings.GOBIN, self.settings.ENV['GOPATH'])
+			return godefinfo_auto_install(self.settings.GOBIN, self.settings.ENV)
 		else:
 			log_output("[settings] Cannot find GOPATH, notifying error API.")
 			return ExportedParams(Error=ERR_GOPATH_UNDEFINED.title, Fix=ERR_GOPATH_UNDEFINED.description)
@@ -249,7 +264,7 @@ class Settings(object):
 		self.AUTO_PROCESS = True
 		self.ENABLE_LOOKBACK = True
 		self.SG_CHANNEL = None
-		output, err, return_code = run_shell_command(self.ENV["SHELL"], "which go")
+		output, err, return_code = run_native_shell_command(self.ENV['SHELL'], ['which', 'go'])
 		if return_code == 0 and output:
 			self.GOBIN = output
 		else:
@@ -310,10 +325,10 @@ class ExportedParams(object):
 		return self.to_json()
 
 
-def godefinfo_auto_install(shell, gobin, gopath):
+def godefinfo_auto_install(gobin, env):
 	godefinfo_install_command = [gobin, 'get', '-u', 'github.com/sqs/godefinfo']
 	log_output('[godefinfo] Settings reloaded, installing godefinfo: %s' % ' '.join(godefinfo_install_command))
-	out, err, return_code = run_shell_command(shell, godefinfo_install_command, custom_gopath=gopath)
+	out, err, return_code = run_shell_command(godefinfo_install_command, env)
 	if return_code != 0:
 		log_symbol_failure(reason='Godefinfo auto-install failure: %s' % str(err))
 		return ExportedParams(Error=ERR_GO_BINARY.title, Fix=ERR_GO_BINARY.description)
@@ -365,17 +380,8 @@ def search_for_symbols(curr_offset, curr_line, row, col, enable_lookback):
 			return curr_offset - (col - last_index_in_row)
 	return curr_offset
 
-def check_go_version():
-	version = get_go_version()
-	if not version:
-		return ERR_GO_VERSION
-	elif version < 1.6:
-		return ERR_GO_VERSION
-	else:
-		return None
-
-def get_go_version(shell_env, gobin):
-	out, err, return_code = run_shell_command(shell_env, [gobin, "version"])
+def get_go_version(env, gobin):
+	out, err, return_code = run_shell_command([gobin, "version"], env)
 	if err:
 		return None
 	else:
@@ -389,8 +395,7 @@ def validate_settings(settings):
 	if 'SHELL' not in settings.ENV:
 		return ERR_UNRECOGNIZED_SHELL
 
-	shell_variable = settings.ENV['SHELL']
-	out, err, return_code = run_shell_command(shell_variable, 'pwd')
+	out, err, return_code = run_shell_command(['pwd'], settings.ENV)
 	if return_code != 0:
 		return ERR_UNRECOGNIZED_SHELL
 
@@ -399,7 +404,7 @@ def validate_settings(settings):
 	if 'GOPATH' not in settings.ENV:
 		return ERR_GOPATH_UNDEFINED
 
-	out, err, return_code = run_shell_command(shell_variable, ["ls", settings.ENV['GOPATH']])
+	out, err, return_code = run_shell_command(["ls", settings.ENV['GOPATH']], settings.ENV)
 	if return_code != 0:
 		return ERR_GOPATH_UNDEFINED
 
@@ -407,12 +412,12 @@ def validate_settings(settings):
 	if not settings.GOBIN:
 		return ERR_GO_BINARY
 
-	out, err, return_code = run_shell_command(shell_variable, [settings.GOBIN, "version"])
+	out, err, return_code = run_shell_command([settings.GOBIN, "version"], settings.ENV)
 	if return_code != 0:
 		return ERR_GO_BINARY
 
 	# Check that the go version is > 1.6
-	version = get_go_version(shell_variable, settings.GOBIN)
+	version = get_go_version(settings.ENV, settings.GOBIN)
 	if not version:
 		return ERR_GO_VERSION
 	elif version < 1.6:
@@ -420,6 +425,6 @@ def validate_settings(settings):
 
 	# Check that godefinfo is available
 	godefinfo_command = [os.path.join(settings.ENV['GOPATH'], 'bin', 'godefinfo'), "-v"]
-	out, err, return_code = run_shell_command(shell_variable, godefinfo_command)
+	out, err, return_code = run_shell_command(godefinfo_command, settings.ENV)
 	if return_code != 0:
 		return ERR_GODEFINFO_INSTALL
