@@ -1,4 +1,4 @@
-# Sourcegraph Edge Sublime Plugin [![CircleCI](https://circleci.com/gh/luttig/sg-sublime.svg?style=svg)](https://circleci.com/gh/luttig/sg-sublime)
+# Sourcegraph Edge Sublime Plugin [![CircleCI](https://circleci.com/gh/sourcegraph/sourcegraph-sublime.svg?style=svg)](https://circleci.com/gh/sourcegraph/sourcegraph-sublime)
 
 ## Overview
 
