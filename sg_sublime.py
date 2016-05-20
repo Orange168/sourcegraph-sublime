@@ -40,7 +40,7 @@ def load_settings(settings):
 	if settings.has('AUTO_PROCESS'):
 		sgedge_settings.AUTO_PROCESS = settings.get('AUTO_PROCESS')
 	if settings.has('GOBIN'):
-		sgedge_settings.GOBIN = settings.get('GOBINGOT').rstrip(os.sep)
+		sgedge_settings.GOBIN = settings.get('GOBIN').rstrip(os.sep)
 
 	shell_gopath, err, return_code = sg_lib.run_shell_command(sgedge_settings.ENV.get('SHELL'), "echo ${GOPATH}")
 	if settings.has('GOPATH'):
@@ -51,7 +51,7 @@ def load_settings(settings):
 	elif find_gopath_from_gosublime():
 		sgedge_settings.ENV['GOPATH'] = find_gopath_from_gosublime()
 		sg_lib.log_output('[settings] Found GOPATH in GoSublime settings: %s' % sgedge_settings.ENV['GOPATH'])
-	if sgedge_settings.ENV['GOPATH']:
+	if sgedge_settings.ENV.get('GOPATH') and sgedge_settings.ENV.get('GOPATH') != '':
 		sgedge_settings.ENV['GOPATH'] = sgedge_settings.ENV['GOPATH'].replace('~', os.environ.get('HOME'))
 		print(sgedge_settings.ENV['GOPATH'])
 	global SG_LIB_INSTANCE
