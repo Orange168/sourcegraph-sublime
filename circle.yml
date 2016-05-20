@@ -15,5 +15,5 @@ test:
     - echo $GOROOT
     - echo $PATH
     - go version
-    - python sg_lib_tests.py
-    - docker run -it luttig/sg-zsh python3 /root/sourcegraph-sublime/sg_lib_tests.py
+    - python sourcegraph_lib_tests.py
+    - docker run -it luttig/sg-zsh python3 /root/sourcegraph-sublime/sourcegraph_lib_tests.py

@@ -2,7 +2,7 @@ import os
 import sys
 
 sys.path.append(os.path.dirname(__file__))
-import sg_lib
+import sourcegraph_lib
 
 import sublime
 
@@ -24,36 +24,36 @@ def find_gopath_from_gosublime():
 
 
 def load_settings(settings):
-	sgedge_settings = sg_lib.Settings()
+	sgedge_settings = sourcegraph_lib.Settings()
 
 	if settings.has('LOG_LEVEL'):
-		sg_lib.LOG_LEVEL = settings.get('LOG_LEVEL')
-		sg_lib.log_output('[settings] Found logging setting in Settings file: %s' % sg_lib.LOG_LEVEL)
+		sourcegraph_lib.LOG_LEVEL = settings.get('LOG_LEVEL')
+		sourcegraph_lib.log_output('[settings] Found logging setting in Settings file: %s' % sourcegraph_lib.LOG_LEVEL)
 	if settings.has('ENABLE_LOOKBACK'):
 		sgedge_settings.ENABLE_LOOKBACK = settings.get('ENABLE_LOOKBACK')
 	if settings.has('SG_BASE_URL'):
 		sgedge_settings.SG_BASE_URL = settings.get('SG_BASE_URL').rstrip('/')
 	if settings.has('SG_LOG_FILE'):
-		sg_lib.SG_LOG_FILE = settings.get('SG_LOG_FILE')
+		sourcegraph_lib.SG_LOG_FILE = settings.get('SG_LOG_FILE')
 	if settings.has('AUTO_OPEN'):
 		sgedge_settings.AUTO_OPEN = settings.get('AUTO_OPEN')
 	if settings.has('AUTO_PROCESS'):
 		sgedge_settings.AUTO_PROCESS = settings.get('AUTO_PROCESS')
 	if settings.has('GOBIN'):
 		sgedge_settings.GOBIN = settings.get('GOBIN').rstrip(os.sep)
-	shell_gopath, err, return_code = sg_lib.run_native_shell_command(sgedge_settings.ENV.get('SHELL'), ['echo', '${GOPATH}'])
+	shell_gopath, err, return_code = sourcegraph_lib.run_native_shell_command(sgedge_settings.ENV.get('SHELL'), ['echo', '${GOPATH}'])
 	if settings.has('GOPATH'):
 		sgedge_settings.ENV['GOPATH'] = str(settings.get('GOPATH').rstrip(os.sep)).strip()
-		sg_lib.log_output('[settings] Using GOPATH found in Sublime settings file: %s' % sgedge_settings.ENV['GOPATH'])
+		sourcegraph_lib.log_output('[settings] Using GOPATH found in Sublime settings file: %s' % sgedge_settings.ENV['GOPATH'])
 	elif shell_gopath and shell_gopath.rstrip(os.sep).strip() != '':
 		sgedge_settings.ENV['GOPATH'] = shell_gopath.rstrip(os.sep).strip()
 	elif find_gopath_from_gosublime():
 		sgedge_settings.ENV['GOPATH'] = find_gopath_from_gosublime()
-		sg_lib.log_output('[settings] Found GOPATH in GoSublime settings: %s' % sgedge_settings.ENV['GOPATH'])
+		sourcegraph_lib.log_output('[settings] Found GOPATH in GoSublime settings: %s' % sgedge_settings.ENV['GOPATH'])
 	if 'GOPATH' in sgedge_settings.ENV and sgedge_settings.ENV.get('GOPATH') != '':
 		sgedge_settings.ENV['GOPATH'] = sgedge_settings.ENV['GOPATH'].replace('~', os.environ.get('HOME'))
 	global SG_LIB_INSTANCE
-	SG_LIB_INSTANCE = sg_lib.SourcegraphEdge(sgedge_settings)
+	SG_LIB_INSTANCE = sourcegraph_lib.SourcegraphEdge(sgedge_settings)
 	SG_LIB_INSTANCE.post_load()
 
 
@@ -79,7 +79,7 @@ def plugin_loaded():
 
 def cursor_offset(view):
 	row, col = view.rowcol(view.sel()[0].begin())
-	symbol_start_offset = sg_lib.search_for_symbols(view.sel()[0].begin(), view.substr(view.line(view.sel()[0])), row, col, SG_LIB_INSTANCE.settings.ENABLE_LOOKBACK)
+	symbol_start_offset = sourcegraph_lib.search_for_symbols(view.sel()[0].begin(), view.substr(view.line(view.sel()[0])), row, col, SG_LIB_INSTANCE.settings.ENABLE_LOOKBACK)
 
 	string_before = view.substr(sublime.Region(0, symbol_start_offset))
 	string_before.encode('utf-8')
@@ -90,7 +90,7 @@ def cursor_offset(view):
 def process_selection(view):
 	if len(view.sel()) == 0:
 		return
-	args = sg_lib.LookupArgs(filename=view.file_name(), cursor_offset=cursor_offset(view), preceding_selection=str.encode(view.substr(sublime.Region(0, view.size()))), selected_token=view.substr(view.extract_scope(view.sel()[0].begin())))
+	args = sourcegraph_lib.LookupArgs(filename=view.file_name(), cursor_offset=cursor_offset(view), preceding_selection=str.encode(view.substr(sublime.Region(0, view.size()))), selected_token=view.substr(view.extract_scope(view.sel()[0].begin())))
 	SG_LIB_INSTANCE.on_selection_modified_handler(args)
 
 
@@ -102,7 +102,7 @@ class SgOpenEdgeCommand(sublime_plugin.TextCommand):
 
 class SgOpenLogCommand(sublime_plugin.WindowCommand):
 	def run(self):
-		self.window.open_file(sg_lib.SG_LOG_FILE)
+		self.window.open_file(sourcegraph_lib.SG_LOG_FILE)
 
 
 class SgManualProcessCommand(sublime_plugin.TextCommand):

@@ -1,9 +1,9 @@
 import os
 import sys
 sys.path.append(os.path.dirname(__file__))
-import sg_lib
-from sg_lib import ExportedParams
-from sg_lib import LookupArgs
+import sourcegraph_lib
+from sourcegraph_lib import ExportedParams
+from sourcegraph_lib import LookupArgs
 
 
 class TestCase(object):
@@ -14,8 +14,8 @@ class TestCase(object):
 
 
 class Tests(object):
-	GODEFINFO_INSTALL = TestCase(lookup_args=LookupArgs(filename='local_func.go', cursor_offset='63', selected_token='func_helper('), expected_output=ExportedParams(Error=sg_lib.ERR_GODEFINFO_INSTALL.title, Fix=sg_lib.ERR_GODEFINFO_INSTALL.description))
-	GOPATH_EMPTY = TestCase(lookup_args=LookupArgs(filename='.go', cursor_offset='0', selected_token=''), expected_output=ExportedParams(Error=sg_lib.ERR_GOPATH_UNDEFINED.title, Fix=sg_lib.ERR_GOPATH_UNDEFINED.description))
+	GODEFINFO_INSTALL = TestCase(lookup_args=LookupArgs(filename='local_func.go', cursor_offset='63', selected_token='func_helper('), expected_output=ExportedParams(Error=sourcegraph_lib.ERR_GODEFINFO_INSTALL.title, Fix=sourcegraph_lib.ERR_GODEFINFO_INSTALL.description))
+	GOPATH_EMPTY = TestCase(lookup_args=LookupArgs(filename='.go', cursor_offset='0', selected_token=''), expected_output=ExportedParams(Error=sourcegraph_lib.ERR_GOPATH_UNDEFINED.title, Fix=sourcegraph_lib.ERR_GOPATH_UNDEFINED.description))
 
 	def __init__(self):
 		self.PACKAGE_IMPORT = TestCase(lookup_args=LookupArgs(filename='package_import.go', cursor_offset='30', selected_token='net/http'), expected_output=ExportedParams(Repo='net/http', Package='net/http'))
