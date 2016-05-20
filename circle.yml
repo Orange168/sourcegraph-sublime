@@ -1,4 +1,7 @@
 machine:
+  pre:
+    - pyenv local 3.5.1
+    - virtualenv venv
   python:
     version: 3.5.1
   services:
