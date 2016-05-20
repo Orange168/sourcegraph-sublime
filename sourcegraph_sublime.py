@@ -16,7 +16,7 @@ SG_LIB_INSTANCE = {}
 
 
 def find_gopath_from_gosublime():
-	if 'env' in sublime.load_settings(GOSUBLIME_SETTINGS_FILENAME):
+	if sublime.load_settings(GOSUBLIME_SETTINGS_FILENAME).has('env'):
 		gosubl_env = sublime.load_settings(GOSUBLIME_SETTINGS_FILENAME).get('env')
 		if 'GOPATH' in gosubl_env:
 			return gosubl_env['GOPATH'].replace('$HOME', os.environ.get('HOME')).replace(':$GS_GOPATH', '')
