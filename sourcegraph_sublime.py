@@ -24,36 +24,36 @@ def find_gopath_from_gosublime():
 
 
 def load_settings(settings):
-	sgedge_settings = sourcegraph_lib.Settings()
+	sg_settings = sourcegraph_lib.Settings()
 
 	if settings.has('LOG_LEVEL'):
 		sourcegraph_lib.LOG_LEVEL = settings.get('LOG_LEVEL')
 		sourcegraph_lib.log_output('[settings] Found logging setting in Settings file: %s' % sourcegraph_lib.LOG_LEVEL)
 	if settings.has('ENABLE_LOOKBACK'):
-		sgedge_settings.ENABLE_LOOKBACK = settings.get('ENABLE_LOOKBACK')
+		sg_settings.ENABLE_LOOKBACK = settings.get('ENABLE_LOOKBACK')
 	if settings.has('SG_BASE_URL'):
-		sgedge_settings.SG_BASE_URL = settings.get('SG_BASE_URL').rstrip('/')
+		sg_settings.SG_BASE_URL = settings.get('SG_BASE_URL').rstrip('/')
 	if settings.has('SG_LOG_FILE'):
 		sourcegraph_lib.SG_LOG_FILE = settings.get('SG_LOG_FILE')
 	if settings.has('AUTO_OPEN'):
-		sgedge_settings.AUTO_OPEN = settings.get('AUTO_OPEN')
+		sg_settings.AUTO_OPEN = settings.get('AUTO_OPEN')
 	if settings.has('AUTO_PROCESS'):
-		sgedge_settings.AUTO_PROCESS = settings.get('AUTO_PROCESS')
+		sg_settings.AUTO_PROCESS = settings.get('AUTO_PROCESS')
 	if settings.has('GOBIN'):
-		sgedge_settings.GOBIN = settings.get('GOBIN').rstrip(os.sep)
-	shell_gopath, err, return_code = sourcegraph_lib.run_native_shell_command(sgedge_settings.ENV.get('SHELL'), ['echo', '${GOPATH}'])
+		sg_settings.GOBIN = settings.get('GOBIN').rstrip(os.sep)
+	shell_gopath, err, return_code = sourcegraph_lib.run_native_shell_command(sg_settings.ENV.get('SHELL'), ['echo', '${GOPATH}'])
 	if settings.has('GOPATH'):
-		sgedge_settings.ENV['GOPATH'] = str(settings.get('GOPATH').rstrip(os.sep)).strip()
-		sourcegraph_lib.log_output('[settings] Using GOPATH found in Sublime settings file: %s' % sgedge_settings.ENV['GOPATH'])
+		sg_settings.ENV['GOPATH'] = str(settings.get('GOPATH').rstrip(os.sep)).strip()
+		sourcegraph_lib.log_output('[settings] Using GOPATH found in Sublime settings file: %s' % sg_settings.ENV['GOPATH'])
 	elif shell_gopath and shell_gopath.rstrip(os.sep).strip() != '':
-		sgedge_settings.ENV['GOPATH'] = shell_gopath.rstrip(os.sep).strip()
+		sg_settings.ENV['GOPATH'] = shell_gopath.rstrip(os.sep).strip()
 	elif find_gopath_from_gosublime():
-		sgedge_settings.ENV['GOPATH'] = find_gopath_from_gosublime()
-		sourcegraph_lib.log_output('[settings] Found GOPATH in GoSublime settings: %s' % sgedge_settings.ENV['GOPATH'])
-	if 'GOPATH' in sgedge_settings.ENV and sgedge_settings.ENV.get('GOPATH') != '':
-		sgedge_settings.ENV['GOPATH'] = sgedge_settings.ENV['GOPATH'].replace('~', os.environ.get('HOME'))
+		sg_settings.ENV['GOPATH'] = find_gopath_from_gosublime()
+		sourcegraph_lib.log_output('[settings] Found GOPATH in GoSublime settings: %s' % sg_settings.ENV['GOPATH'])
+	if 'GOPATH' in sg_settings.ENV and sg_settings.ENV.get('GOPATH') != '':
+		sg_settings.ENV['GOPATH'] = sg_settings.ENV['GOPATH'].replace('~', os.environ.get('HOME'))
 	global SG_LIB_INSTANCE
-	SG_LIB_INSTANCE = sourcegraph_lib.SourcegraphEdge(sgedge_settings)
+	SG_LIB_INSTANCE = sourcegraph_lib.Sourcegraph(sg_settings)
 	SG_LIB_INSTANCE.post_load()
 
 
@@ -62,7 +62,7 @@ def reload_settings():
 	settings = sublime.load_settings(SETTINGS_FILENAME)
 	load_settings(settings)
 	if SG_LIB_INSTANCE.settings.SG_BASE_URL != old_base_url and SG_LIB_INSTANCE.settings.AUTO_OPEN:
-		SG_LIB_INSTANCE.open_edge_channel()
+		SG_LIB_INSTANCE.open_channel()
 
 
 def plugin_loaded():
@@ -94,9 +94,9 @@ def process_selection(view):
 	SG_LIB_INSTANCE.on_selection_modified_handler(args)
 
 
-class SgOpenEdgeCommand(sublime_plugin.TextCommand):
+class SgOpenChannelCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
-		SG_LIB_INSTANCE.open_edge_channel(hard_refresh=True)
+		SG_LIB_INSTANCE.open_channel(hard_refresh=True)
 		process_selection(self.view)
 
 

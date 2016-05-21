@@ -1,14 +1,14 @@
-# Sourcegraph Edge Sublime Plugin [![CircleCI](https://circleci.com/gh/sourcegraph/sourcegraph-sublime.svg?style=svg)](https://circleci.com/gh/sourcegraph/sourcegraph-sublime)
+# Sourcegraph Sublime [![CircleCI](https://circleci.com/gh/sourcegraph/sourcegraph-sublime.svg?style=svg)](https://circleci.com/gh/sourcegraph/sourcegraph-sublime)
 
 ## Overview
 
-The Sourcegraph Sublime Plugin allows you to view Go definitions in real-time on [sourcegraph.com](http://www.sourcegraph.com) as you code, so you can stay focused on what's important: your code. When your cursor is on a certain Go symbol, it should load in an Edge channel in your browser:
+Sourcegraph Sublime allows you to view Go definitions in real-time on [sourcegraph.com](http://www.sourcegraph.com) as you code, so you can stay focused on what's important: your code. When your cursor is on a certain Go symbol, it should load in a channel in your browser:
 
-![Sourcegraph Edge Sublime Plugin](images/setup.jpg)
+![Sourcegraph Sublime](images/setup.jpg)
 
 ## Setup
 
-To install Sourcegraph Edge, clone the `sourcegraph-sublime` plugin into your Sublime Text 3 Package folder:
+To install Sourcegraph Sublime, clone `sourcegraph-sublime` into your Sublime Text 3 Packages folder:
 
 OSX:
 
@@ -24,15 +24,15 @@ git clone https://github.com/sourcegraph/sourcegraph-sublime ~/.config/sublime-t
 
 ## Usage
 
-The plugin should automatically open a browser tab to initialize your Edge session when in Go files. If, for any reason, your tab gets closed, press <kbd>&#8984;</kbd>+<kbd>.</kbd>, <kbd>&#8984;</kbd>+<kbd>0</kbd> in any file to reopen the Sourcegraph Edge tab. Alternatively, you can click on `Sublime Text > Preferences > Package Settings > Sourcegraph > Reopen Browser Tab`. As you navigate through Go files, your browser should automatically load the definition and references for recognized symbols.
+Sourcegraph Sublime should automatically open a browser tab to initialize your Sourcegraph session when in Go files. If, for any reason, your tab gets closed, press <kbd>&#8984;</kbd>+<kbd>.</kbd>, <kbd>&#8984;</kbd>+<kbd>0</kbd> in any file to reopen the Sourcegraph tab. Alternatively, you can click on `Sublime Text > Preferences > Package Settings > Sourcegraph > Reopen Browser Tab`. As you navigate through Go files, your browser should automatically load the definition and references for recognized symbols.
 
 ## Flags
 
-Sourcegraph Edge has a number of flags to customize the plugin for you. To change your plugin settings, open `Sourcegraph.sublime-settings` by clicking `Sublime Text > Preferences > Package Settings > Sourcegraph > Settings - User`.
+Sourcegraph Sublime has a number of flags to customize your experience. To change your Sourcegraph settings, open `Sourcegraph.sublime-settings` by clicking `Sublime Text > Preferences > Package Settings > Sourcegraph > Settings - User`.
 
 ### Custom GOBIN or GOPATH
 
-The plugin assumes a `GOBIN` of `/usr/local/bin/go`, and loads your `/bin/bash` startup scripts to search for the `GOPATH` environment variable. If your `GOPATH` is not defined in your startup scripts, the plugin then searches for GoSublime settings files for `GOPATH`. If the plugin cannot find your `GOPATH`, or if you would like to use a custom `GOPATH` or `GOBIN`, add them in the settings file as follows:
+Sourcegraph Sublime assumes a `GOBIN` of `/usr/local/bin/go`, and loads your `/bin/bash` startup scripts to search for the `GOPATH` environment variable. If your `GOPATH` is not defined in your startup scripts, Sourcegraph Sublime then searches for GoSublime settings files for `GOPATH`. If Sourcegraph cannot find your `GOPATH`, or if you would like to use a custom `GOPATH` or `GOBIN`, add them in the settings file as follows:
 
 ```yml
 {
@@ -57,7 +57,7 @@ Sourcegraph automatically processes your code as you type. If you want to disabl
 
 ### Auto-open browser
 
-This setting auto-opens the channel in your browser when you click on a definition in Go. If it is set to false, then you can access the edge channel by clicking <kbd>&#8984;</kbd>+<kbd>.</kbd>, <kbd>&#8984;</kbd>+<kbd>0</kbd>. To disable auto-opening, set the `AUTO_OPEN` flag to `false` in your settings:
+This setting auto-opens the channel in your browser when you click on a definition in Go. If it is set to false, then you can access the channel by clicking <kbd>&#8984;</kbd>+<kbd>.</kbd>, <kbd>&#8984;</kbd>+<kbd>0</kbd>. To disable auto-opening, set the `AUTO_OPEN` flag to `false` in your settings:
 
 ```yml
 {
@@ -69,7 +69,7 @@ This setting auto-opens the channel in your browser when you click on a definiti
 
 ### Verbose logging
 
-This setting gives verbose output from the Sourcegraph Edge plugin to the Sublime Text console, which can be helping when troubleshooting Sourcegraph Edge. To open the Sublime console, simply type <kbd>&#159;</kbd>+<kbd>`</kbd>. Different levels of logging are available:
+This setting gives verbose output from Sourcegraph Sublime to the Sublime Text console, which can be helping when troubleshooting Sourcegraph Sublime. To open the Sublime console, simply type <kbd>&#159;</kbd>+<kbd>`</kbd>. Different levels of logging are available:
 
 No logging: 0
 Only log symbols identified by godefinfo: 1
@@ -86,7 +86,7 @@ Log all debugging information: 3
 
 ## Godefinfo
 
-Sourcegraph Edge should automatically install `godefinfo` when it loads your settings. However, if you still receive error message about `godefinfo` installation, you can install it manually by running the following command:
+Sourcegraph Sublime should automatically install `godefinfo` when it loads your settings. However, if you still receive error message about `godefinfo` installation, you can install it manually by running the following command:
 
 ```shell
 go get -u github.com/sqs/godefinfo
@@ -94,7 +94,7 @@ go get -u github.com/sqs/godefinfo
 
 ### Local server
 
-If you want to try the plugin on a local Sourcegraph server, you can define its base URL in this file using the key `SG_BASE_URL`.
+If you want to try Sourcegraph Sublime on a local Sourcegraph server, you can define its base URL in this file using the key `SG_BASE_URL`.
 
 ```yml
 {
@@ -106,4 +106,4 @@ If you want to try the plugin on a local Sourcegraph server, you can define its 
 
 ## Support
 
-The Sourcegraph Edge Sublime Plugin has currently only been tested using Sublime Text 3 on Mac OS X and Linux.
+Sourcegraph Sublime has currently only been tested using Sublime Text 3 on Mac OS X and Linux.

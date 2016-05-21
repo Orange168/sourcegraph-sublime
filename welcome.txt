@@ -1,9 +1,9 @@
-Sourcegraph Edge Sublime Plugin
-===============================
+Sourcegraph Sublime
+===================
 
-  Thank you for installing the Sourcegraph Edge Sublime Plugin!
+  Thank you for installing Sourcegraph Sublime!
 
-  To begin using the plugin, open any Go file and click on a symbol.
+  To begin using Sourcegraph Sublime, open any Go file and click on a symbol.
 
 
 
