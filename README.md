@@ -69,7 +69,7 @@ This setting auto-opens the channel in your browser when you click on a definiti
 
 ### Verbose logging
 
-This setting gives verbose output from Sourcegraph Sublime to the Sublime Text console, which can be helping when troubleshooting Sourcegraph Sublime. To open the Sublime console, simply type <kbd>&#159;</kbd>+<kbd>`</kbd>. Different levels of logging are available:
+This setting gives verbose output from Sourcegraph Sublime to the Sublime Text console, which can be helping when troubleshooting Sourcegraph Sublime. To open the Sublime console, simply type <kbd>control</kbd>+<kbd>`</kbd>. Different levels of logging are available:
 
 No logging: 0
 Only log symbols identified by godefinfo: 1
