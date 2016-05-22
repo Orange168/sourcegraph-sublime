@@ -8,25 +8,25 @@ The Sourcegraph Sublime Plugin allows you to view Go definitions in real-time on
 
 ## Setup
 
-To install Sourcegraph Edge, clone the `sourcegraph-sublime` plugin into your Sublime Text 3 Package folder:
+To install Sourcegraph Edge, clone the `sourcegraph-sublime` plugin into your Sublime Text 3 Packages folder:
 
 OSX:
 
 ```shell
-git clone git://github.com/sourcegraph/sourcegraph-sublime ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/sourcegraph-sublime
+git clone ssh://git@github.com/sourcegraph/sourcegraph-sublime ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/sourcegraph-sublime
 ```
 
 Linux:
 
 ```shell
-git clone git://github.com/sourcegraph/sourcegraph-sublime ~/.config/sublime-text-3/Packages/sourcegraph-sublime
+git clone ssh://git@github.com/sourcegraph/sourcegraph-sublime ~/.config/sublime-text-3/Packages/sourcegraph-sublime
 ```
 
 Windows:
 
 ```shell
 cd %APPDATA%\Sublime Text 3\Packages
-git clone git://github.com/sourcegraph/sourcegraph-sublime
+git clone ssh://git@github.com/sourcegraph/sourcegraph-sublime
 ```
 
 
