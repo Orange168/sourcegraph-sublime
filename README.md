@@ -13,14 +13,22 @@ To install Sourcegraph Edge, clone the `sourcegraph-sublime` plugin into your Su
 OSX:
 
 ```shell
-git clone https://github.com/sourcegraph/sourcegraph-sublime ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/sourcegraph-sublime
+git clone git://github.com/sourcegraph/sourcegraph-sublime ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/sourcegraph-sublime
 ```
 
 Linux:
 
 ```shell
-git clone https://github.com/sourcegraph/sourcegraph-sublime ~/.config/sublime-text-3/Packages/sourcegraph-sublime
+git clone git://github.com/sourcegraph/sourcegraph-sublime ~/.config/sublime-text-3/Packages/sourcegraph-sublime
 ```
+
+Windows:
+
+```shell
+cd %APPDATA%\Sublime Text 3\Packages
+git clone git://github.com/sourcegraph/sourcegraph-sublime
+```
+
 
 ## Usage
 
@@ -106,4 +114,4 @@ If you want to try the plugin on a local Sourcegraph server, you can define its 
 
 ## Support
 
-The Sourcegraph Edge Sublime Plugin has currently only been tested using Sublime Text 3 on Mac OS X and Linux.
+The Sourcegraph Edge Sublime Plugin has currently only been tested using Sublime Text 3.
