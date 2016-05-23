@@ -75,7 +75,10 @@ def shell_startup_info():
 
 def find_gopath_from_shell(shell):
 	if is_windows():
-		return os.environ.get('GOPATH').rstrip(os.sep).strip()
+		if os.environ.get('GOPATH') and os.environ.get('GOPATH') != '':
+			return os.environ.get('GOPATH').rstrip(os.sep).strip()
+		else:
+			return None
 	else:
 		output, err, return_code = run_native_shell_command(shell, ['echo', '${GOPATH}'])
 		if return_code == 0:
