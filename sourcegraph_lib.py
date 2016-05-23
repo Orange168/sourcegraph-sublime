@@ -32,11 +32,11 @@ class Error(object):
 	def __str__(self):
 		return "%s : %s" % (self.title, self.description)
 
-ERR_GOPATH_UNDEFINED = Error('GOPATH Undefined', 'Could not find GOPATH in your shell startup scripts or Sublime settings. Please read the GOPATH section in the Sourcegraph Edge README https://github.com/sourcegraph/sourcegraph-sublime to learn how to set your GOPATH.')
-ERR_GODEFINFO_INSTALL = Error('godefinfo binary not found in your PATH', 'Please read the Installation section in the Sourcegraph Edge README https://github.com/sourcegraph/sourcegraph-sublime to learn how to install godefinfo.')
-ERR_GO_BINARY = Error('Go binary not found in your PATH', 'Please read the GOBIN section in the Sourcegraph Edge README https://github.com/sourcegraph/sourcegraph-sublime to learn how to set your GOBIN.')
-ERR_GO_VERSION = Error('Go version is < 1.6', 'Sourcegraph Edge only works with Go 1.6 and greater.')
-ERR_UNRECOGNIZED_SHELL = Error('Sourcegraph for Sublime can\'t execute commands against your shell', 'Contact Sourcegraph with your OS details, and we\'ll try to deliver Sourcegraph Edge for your OS')
+ERR_GOPATH_UNDEFINED = Error('GOPATH Undefined', 'Could not find GOPATH in your shell startup scripts or Sublime settings. Please read the GOPATH section in the Sourcegraph Sublime README https://github.com/sourcegraph/sourcegraph-sublime to learn how to set your GOPATH.')
+ERR_GODEFINFO_INSTALL = Error('godefinfo binary not found in your PATH', 'Please read the Installation section in the Sourcegraph Sublime README https://github.com/sourcegraph/sourcegraph-sublime to learn how to install godefinfo.')
+ERR_GO_BINARY = Error('Go binary not found in your PATH', 'Please read the GOBIN section in the Sourcegraph Sublime README https://github.com/sourcegraph/sourcegraph-sublime to learn how to set your GOBIN.')
+ERR_GO_VERSION = Error('Go version is < 1.6', 'Sourcegraph Sublime only works with Go 1.6 and greater.')
+ERR_UNRECOGNIZED_SHELL = Error('Sourcegraph for Sublime can\'t execute commands against your shell', 'Contact Sourcegraph with your OS details, and we\'ll try to deliver Sourcegraph for your OS')
 
 def ERR_SYMBOL_NOT_FOUND(symbol):
 	return Error('Could not find symbol "%s".' % symbol, 'Please make sure you have selected a valid symbol, and have all imported packages installed on your computer.')
@@ -65,11 +65,11 @@ def run_native_shell_command(shell_env, command):
 		err = err.decode().strip()
 	return out, err, process.returncode
 
-class SourcegraphEdge(object):
+class Sourcegraph(object):
 	def __init__(self, settings):
-		super(SourcegraphEdge, self).__init__()
-		self.IS_OPENING_EDGE_CHANNEL = False
-		self.HAVE_OPENED_EDGE_CHANNEL = False
+		super(Sourcegraph, self).__init__()
+		self.IS_OPENING_CHANNEL = False
+		self.HAVE_OPENED_CHANNEL = False
 		self.EXPORTED_PARAMS_CACHE = None
 		self.settings = settings
 
@@ -133,9 +133,9 @@ class SourcegraphEdge(object):
 		if self.EXPORTED_PARAMS_CACHE == exported_params:
 			return
 		self.EXPORTED_PARAMS_CACHE = exported_params
-		if not self.HAVE_OPENED_EDGE_CHANNEL and self.settings.AUTO_OPEN:
-			self.open_edge_channel()
-			self.HAVE_OPENED_EDGE_CHANNEL = True
+		if not self.HAVE_OPENED_CHANNEL and self.settings.AUTO_OPEN:
+			self.open_channel()
+			self.HAVE_OPENED_CHANNEL = True
 		post_url = '%s/.api/channel/%s' % (self.settings.SG_BASE_URL, self.settings.SG_CHANNEL)
 		self.send_curl_request_network(post_url, exported_params.to_json())
 
@@ -153,13 +153,13 @@ class SourcegraphEdge(object):
 			log_output('[network] Server responded with code %s' % str(status_code), is_network=True)
 			f.close()
 		except HTTPError as err:
-			if self.settings.AUTO_OPEN and not self.IS_OPENING_EDGE_CHANNEL:
-				self.IS_OPENING_EDGE_CHANNEL = True
+			if self.settings.AUTO_OPEN and not self.IS_OPENING_CHANNEL:
+				self.IS_OPENING_CHANNEL = True
 				log_output('[network] Server responded with err code %s, reopening browser.' % str(err.code), is_network=True)
-				self.open_edge_channel(hard_refresh=True)
+				self.open_channel(hard_refresh=True)
 				self.send_curl_request_network(post_url, json_arguments)
 				time.sleep(2)
-				self.IS_OPENING_EDGE_CHANNEL = False
+				self.IS_OPENING_CHANNEL = False
 
 	def open_channel_os(self):
 		self.get_channel()
@@ -170,13 +170,13 @@ class SourcegraphEdge(object):
 			command.insert(0, 'open')
 		else:
 			command.insert(0, 'start')
-		log_output('[open_edge] Opening Edge channel in browser: %s' % command)
+		log_output('[open_channel] Opening channel in browser: %s' % command)
 		run_shell_command(command, self.settings.ENV)
 		time.sleep(2)
 
-	def open_edge_channel(self, hard_refresh=False):
+	def open_channel(self, hard_refresh=False):
 		if hard_refresh:
-			self.HAVE_OPENED_EDGE_CHANNEL = True
+			self.HAVE_OPENED_CHANNEL = True
 
 		self.open_channel_os()
 
@@ -258,7 +258,7 @@ class LookupArgs(object):
 class Settings(object):
 	def __init__(self, **kwds):
 		super(Settings, self).__init__()
-		self.SG_BASE_URL = 'https://grpc-staging.sourcegraph.com'
+		self.SG_BASE_URL = 'https://grpc.sourcegraph.com'
 		self.ENV = os.environ.copy()
 		self.AUTO_OPEN = True
 		self.AUTO_PROCESS = True
