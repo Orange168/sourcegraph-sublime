@@ -13,14 +13,22 @@ To install Sourcegraph for Sublime, clone `sourcegraph-sublime` into your Sublim
 OSX:
 
 ```shell
-git clone https://github.com/sourcegraph/sourcegraph-sublime ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/sourcegraph-sublime
+git clone ssh://git@github.com/sourcegraph/sourcegraph-sublime ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/sourcegraph-sublime
 ```
 
 Linux:
 
 ```shell
-git clone https://github.com/sourcegraph/sourcegraph-sublime ~/.config/sublime-text-3/Packages/sourcegraph-sublime
+git clone ssh://git@github.com/sourcegraph/sourcegraph-sublime ~/.config/sublime-text-3/Packages/sourcegraph-sublime
 ```
+
+Windows:
+
+```shell
+cd %APPDATA%\Sublime Text 3\Packages
+git clone ssh://git@github.com/sourcegraph/sourcegraph-sublime
+```
+
 
 ## Usage
 
@@ -106,4 +114,4 @@ If you want to try Sourcegraph for Sublime on a local Sourcegraph server, you ca
 
 ## Support
 
-Sourcegraph for Sublime has currently only been tested using Sublime Text 3 on Mac OS X and Linux.
+Sourcegraph for Sublime has currently only been tested using Sublime Text 3.

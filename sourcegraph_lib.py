@@ -41,9 +41,56 @@ ERR_UNRECOGNIZED_SHELL = Error('Sourcegraph for Sublime can\'t execute commands 
 def ERR_SYMBOL_NOT_FOUND(symbol):
 	return Error('Could not find symbol "%s".' % symbol, 'Please make sure you have selected a valid symbol, and have all imported packages installed on your computer.')
 
+def is_windows():
+	return os.name == 'nt'
+
+def get_user_name():
+	if is_windows():
+		return os.environ.get('USER')
+	else:
+		return os.environ.get('USERNAME')
+
+def get_home_path():
+	if is_windows():
+		return os.environ.get('HOMEPATH')
+	else:
+		return os.environ.get('HOME')
+
+def find_gobin(shell):
+	if is_windows():
+		output, err, return_code = run_shell_command(['where', 'go'], None)
+	else:
+		output, err, return_code = run_native_shell_command(shell, ['which', 'go'])
+	if return_code == 0 and output:
+		return output.rstrip('.exe')
+	else:
+		return os.path.join('/usr', 'local', 'go', 'bin', 'go')
+
+def shell_startup_info():
+	if not is_windows():
+		return None
+	startup_info = subprocess.STARTUPINFO()
+	startup_info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+	return startup_info
+
+def find_gopath_from_shell(shell):
+	if is_windows():
+		if os.environ.get('GOPATH') and os.environ.get('GOPATH') != '':
+			return os.environ.get('GOPATH').rstrip(os.sep).strip()
+		else:
+			return None
+	else:
+		output, err, return_code = run_native_shell_command(shell, ['echo', '${GOPATH}'])
+		if return_code == 0:
+			return output.rstrip(os.sep).strip()
+		else:
+			log_output('[settings] Could not find GOPATH from shell: %s' % str(err))
+			return None
+
 def run_shell_command(command, env):
 	try:
-		process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+		log_output('Running shell command: %s' % ' '.join(command))
+		process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, startupinfo=shell_startup_info())
 		out, err = process.communicate()
 		if out:
 			out = out.decode().strip()
@@ -57,8 +104,12 @@ def run_native_shell_command(shell_env, command):
 	if isinstance(command, list):
 		command = " ".join(command)
 	native_command = [shell_env, '--login', '-l', '-c', command]
-	process = subprocess.Popen(native_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	if not shell_env or shell_env == '':
+		native_command = command.split()
+
+	process = subprocess.Popen(native_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, startupinfo=shell_startup_info())
 	out, err = process.communicate()
+	log_output('Command %s output: %s' % (native_command, out))
 	if out:
 		out = out.decode().strip().split('\n')[-1]
 	if err:
@@ -168,6 +219,8 @@ class Sourcegraph(object):
 			command.insert(0, 'xdg-open')
 		elif sys.platform == 'darwin':
 			command.insert(0, 'open')
+		elif is_windows():
+			command.insert(0, 'explorer')
 		else:
 			command.insert(0, 'start')
 		log_output('[open_channel] Opening channel in browser: %s' % command)
@@ -187,7 +240,7 @@ class Sourcegraph(object):
 		godefinfo_output = b''
 		stderr = None
 		try:
-			godefinfo_process = subprocess.Popen(godefinfo_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=self.settings.ENV)
+			godefinfo_process = subprocess.Popen(godefinfo_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=self.settings.ENV, startupinfo=shell_startup_info())
 			godefinfo_output, stderr = godefinfo_process.communicate(input=godefinfo_region)
 			if godefinfo_output:
 				godefinfo_output = godefinfo_output.decode()
@@ -211,7 +264,7 @@ class Sourcegraph(object):
 	def get_channel(self):
 		if self.settings.SG_CHANNEL is None:
 			self.settings.SG_CHANNEL = '%s-%06x%06x%06x%06x%06x%06x' % \
-				(os.environ.get('USER'), random.randrange(16**6), random.randrange(16**6),
+				(get_user_name(), random.randrange(16**6), random.randrange(16**6),
 					random.randrange(16**6), random.randrange(16**6), random.randrange(16**6), random.randrange(16**6))
 		else:
 			log_output('Using existing channel: %s' % self.settings.SG_CHANNEL)
@@ -264,11 +317,7 @@ class Settings(object):
 		self.AUTO_PROCESS = True
 		self.ENABLE_LOOKBACK = True
 		self.SG_CHANNEL = None
-		output, err, return_code = run_native_shell_command(self.ENV['SHELL'], ['which', 'go'])
-		if return_code == 0 and output:
-			self.GOBIN = output
-		else:
-			self.GOBIN = os.path.join('/usr', 'local', 'go', 'bin', 'go')
+		self.GOBIN = find_gobin(self.ENV.get('SHELL'))
 		self.__dict__.update(kwds)
 
 	def __str__(self):
@@ -380,8 +429,7 @@ def search_for_symbols(curr_offset, curr_line, row, col, enable_lookback):
 			return curr_offset - (col - last_index_in_row)
 	return curr_offset
 
-def get_go_version(env, gobin):
-	out, err, return_code = run_shell_command([gobin, "version"], env)
+def get_go_version(out, err):
 	if err:
 		return None
 	else:
@@ -392,20 +440,22 @@ def get_go_version(env, gobin):
 
 def validate_settings(settings):
 	# Validate that we have access to a working shell
-	if 'SHELL' not in settings.ENV:
+	if not is_windows() and 'SHELL' not in settings.ENV:
 		return ERR_UNRECOGNIZED_SHELL
 
-	out, err, return_code = run_shell_command(['pwd'], settings.ENV)
-	if return_code != 0:
-		return ERR_UNRECOGNIZED_SHELL
+	if not is_windows():
+		out, err, return_code = run_shell_command(['echo'], settings.ENV)
+		if return_code != 0:
+			return ERR_UNRECOGNIZED_SHELL
 
 	# Check that GOPATH exists and is a valid directory
 	# TODO why is GOPATH set in the first place? Make sure it is equal to settings.ENV["GOPATH"]
 	if 'GOPATH' not in settings.ENV:
 		return ERR_GOPATH_UNDEFINED
 
-	out, err, return_code = run_shell_command(["ls", settings.ENV['GOPATH']], settings.ENV)
-	if return_code != 0:
+	try:
+		os.listdir(settings.ENV['GOPATH'])
+	except:
 		return ERR_GOPATH_UNDEFINED
 
 	# Check that we have access to the go binary
@@ -417,14 +467,14 @@ def validate_settings(settings):
 		return ERR_GO_BINARY
 
 	# Check that the go version is > 1.6
-	version = get_go_version(settings.ENV, settings.GOBIN)
+	version = get_go_version(out, err)
 	if not version:
 		return ERR_GO_VERSION
 	elif version < 1.6:
 		return ERR_GO_VERSION
 
 	# Check that godefinfo is available
-	godefinfo_command = [os.path.join(settings.ENV['GOPATH'], 'bin', 'godefinfo'), "-v"]
+	godefinfo_command = [os.path.join(settings.ENV['GOPATH'], 'bin', 'godefinfo'), '-v']
 	out, err, return_code = run_shell_command(godefinfo_command, settings.ENV)
 	if return_code != 0:
 		return ERR_GODEFINFO_INSTALL

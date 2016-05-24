@@ -125,7 +125,8 @@ class VerifyGodefinfoAutoUpdate(unittest.TestCase):
 
     def test(self):
         test_settings = sourcegraph_lib.Settings()
-        godefinfo_dir = os.path.join(os.environ.get('GOPATH'), 'src', 'github.com', 'sqs', 'godefinfo')
+        sourcegraph_lib_instance = start_default_instance()
+        godefinfo_dir = os.path.join(sourcegraph_lib_instance.settings.ENV['GOPATH'], 'src', 'github.com', 'sqs', 'godefinfo')
         current_commit = self.git_commit(godefinfo_dir)
 
         reset_commit_process = subprocess.Popen(['git', 'reset', '--hard', 'HEAD~'], cwd=godefinfo_dir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
