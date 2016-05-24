@@ -33,6 +33,8 @@ def load_settings(settings):
 		sg_settings.ENABLE_LOOKBACK = settings.get('ENABLE_LOOKBACK')
 	if settings.has('SG_BASE_URL'):
 		sg_settings.SG_BASE_URL = settings.get('SG_BASE_URL').rstrip('/')
+	if settings.has('SG_SEND_URL'):
+		sg_settings.SG_SEND_URL = settings.get('SG_SEND_URL').rstrip('/')
 	if settings.has('SG_LOG_FILE'):
 		sourcegraph_lib.SG_LOG_FILE = settings.get('SG_LOG_FILE')
 	if settings.has('AUTO_OPEN'):
