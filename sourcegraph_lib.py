@@ -187,7 +187,7 @@ class Sourcegraph(object):
 		if not self.HAVE_OPENED_CHANNEL and self.settings.AUTO_OPEN:
 			self.open_channel()
 			self.HAVE_OPENED_CHANNEL = True
-		post_url = '%s/.api/channel/%s' % (self.settings.SG_BASE_URL, self.settings.SG_CHANNEL)
+		post_url = '%s/.api/channel/%s' % (self.settings.SG_SEND_URL, self.settings.SG_CHANNEL)
 		self.send_curl_request_network(post_url, exported_params.to_json())
 
 	def send_curl_request_network(self, post_url, json_arguments):
@@ -317,7 +317,8 @@ class LookupArgs(object):
 class Settings(object):
 	def __init__(self, **kwds):
 		super(Settings, self).__init__()
-		self.SG_BASE_URL = 'https://grpc.sourcegraph.com'
+		self.SG_BASE_URL = 'https://sourcegraph.com'
+		self.SG_SEND_URL = 'https://grpc.sourcegraph.com'
 		self.ENV = os.environ.copy()
 		self.AUTO_OPEN = True
 		self.AUTO_PROCESS = True
