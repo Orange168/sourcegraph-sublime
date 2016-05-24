@@ -13,4 +13,18 @@
 			"file": "${packages}/User/Sourcegraph.sublime-settings"
 		}
 	},
+	{
+		"caption": "Sourcegraph: Read Me",
+		"command": "open_file",
+		"args": {
+			"file": "${packages}/sourcegraph-sublime/README.md"
+		}
+	},
+	{
+		"caption": "Sourcegraph: License (MIT)",
+		"command": "open_file",
+		"args": {
+			"file": "${packages}/sourcegraph-sublime/LICENSE.md"
+		}
+	}
 ]
