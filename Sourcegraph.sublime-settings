@@ -8,7 +8,8 @@
 	/*
 	This setting allows you to use channels on a local version of Sourcegraph.
 	*/
-	"SG_BASE_URL": "https://grpc.sourcegraph.com",
+	"SG_BASE_URL": "https://sourcegraph.com",
+	"SG_SEND_URL": "https://grpc.sourcegraph.com",
 
 	/*
 	This setting toggles the auto-opening feature for the Sourcegraph channel in your browser

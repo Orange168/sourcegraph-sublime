@@ -323,8 +323,8 @@ class Settings(object):
 		self.SG_BASE_URL = 'https://sourcegraph.com'
 		self.SG_SEND_URL = 'https://grpc.sourcegraph.com'
 		self.ENV = os.environ.copy()
-		self.AUTO_OPEN = True
-		self.AUTO_PROCESS = True
+		self.AUTO_OPEN = False
+		self.AUTO_PROCESS = False
 		self.ENABLE_LOOKBACK = True
 		self.SG_CHANNEL = None
 		self.GOBIN = find_gobin(self.ENV.get('SHELL'))
