@@ -253,6 +253,12 @@ class Sourcegraph(object):
 		return stderr, godefinfo_output
 
 	def add_gopath_to_path(self):
+		gopath_err = check_gopath(self.settings.ENV)
+		if gopath_err:
+			return gopath_err
+		go_err = check_go(self.settings)
+		if go_err:
+			return go_err
 		if self.settings.ENV.get('GOPATH') != '' and self.settings.ENV.get('GOPATH'):
 			for gopath_loc in self.settings.ENV['GOPATH'].split(os.pathsep):
 				self.settings.ENV['PATH'] += os.pathsep + os.path.join(gopath_loc, 'bin')
@@ -437,27 +443,17 @@ def get_go_version(out, err):
 		version = float(out[0:3])
 		return version
 
-
-def validate_settings(settings):
-	# Validate that we have access to a working shell
-	if not is_windows() and 'SHELL' not in settings.ENV:
-		return ERR_UNRECOGNIZED_SHELL
-
-	if not is_windows():
-		out, err, return_code = run_shell_command(['echo'], settings.ENV)
-		if return_code != 0:
-			return ERR_UNRECOGNIZED_SHELL
-
+def check_gopath(env):
 	# Check that GOPATH exists and is a valid directory
 	# TODO why is GOPATH set in the first place? Make sure it is equal to settings.ENV["GOPATH"]
-	if 'GOPATH' not in settings.ENV:
+	if 'GOPATH' not in env:
 		return ERR_GOPATH_UNDEFINED
 
-	try:
-		os.listdir(settings.ENV['GOPATH'])
-	except:
+	out, err, return_code = run_shell_command(["ls", env['GOPATH']], env)
+	if return_code != 0:
 		return ERR_GOPATH_UNDEFINED
 
+def check_go(settings):
 	# Check that we have access to the go binary
 	if not settings.GOBIN:
 		return ERR_GO_BINARY
@@ -472,6 +468,24 @@ def validate_settings(settings):
 		return ERR_GO_VERSION
 	elif version < 1.6:
 		return ERR_GO_VERSION
+
+def validate_settings(settings):
+	# Validate that we have access to a working shell
+	if not is_windows() and 'SHELL' not in settings.ENV:
+		return ERR_UNRECOGNIZED_SHELL
+
+	if not is_windows():
+		out, err, return_code = run_shell_command(['pwd'], settings.ENV)
+		if return_code != 0:
+			return ERR_UNRECOGNIZED_SHELL
+
+	gopath_err = check_gopath(settings.ENV)
+	if gopath_err:
+		return gopath_err
+
+	go_err = check_go(settings)
+	if go_err:
+		return go_err
 
 	# Check that godefinfo is available
 	godefinfo_command = [os.path.join(settings.ENV['GOPATH'], 'bin', 'godefinfo'), '-v']

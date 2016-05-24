@@ -84,8 +84,8 @@ class VerifyGoPathEmptyError(unittest.TestCase):
         check_output(self, test_output, test.expected_output)
 
         error_message = sourcegraph_lib_instance.add_gopath_to_path()
-        self.assertEqual(error_message.Error, sourcegraph_lib.ERR_GOPATH_UNDEFINED.title)
-        self.assertEqual(error_message.Fix, sourcegraph_lib.ERR_GOPATH_UNDEFINED.description)
+        self.assertEqual(error_message.title, sourcegraph_lib.ERR_GOPATH_UNDEFINED.title)
+        self.assertEqual(error_message.description, sourcegraph_lib.ERR_GOPATH_UNDEFINED.description)
 
 
 # When godefinfo binary not yet installed

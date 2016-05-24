@@ -40,34 +40,20 @@ def load_settings(settings):
 	if settings.has('AUTO_PROCESS'):
 		sg_settings.AUTO_PROCESS = settings.get('AUTO_PROCESS')
 	if settings.has('GOBIN'):
-<<<<<<< HEAD
-		sgedge_settings.GOBIN = settings.get('GOBIN').rstrip(os.sep)
-	shell_gopath = sourcegraph_lib.find_gopath_from_shell(sgedge_settings.ENV.get('SHELL'))
-	if settings.has('GOPATH'):
-		sgedge_settings.ENV['GOPATH'] = str(settings.get('GOPATH').rstrip(os.sep)).strip()
-		sourcegraph_lib.log_output('[settings] Using GOPATH found in Sublime settings file: %s' % sgedge_settings.ENV['GOPATH'])
-	elif shell_gopath and shell_gopath != '':
-		sgedge_settings.ENV['GOPATH'] = shell_gopath.rstrip(os.sep).strip()
-		sourcegraph_lib.log_output('[settings] Using GOPATH from shell: %s' % sgedge_settings.ENV['GOPATH'])
-	elif find_gopath_from_gosublime():
-		sgedge_settings.ENV['GOPATH'] = find_gopath_from_gosublime()
-		sourcegraph_lib.log_output('[settings] Found GOPATH in GoSublime settings: %s' % sgedge_settings.ENV['GOPATH'])
-	if 'GOPATH' in sgedge_settings.ENV and sgedge_settings.ENV.get('GOPATH') != '':
-		sgedge_settings.ENV['GOPATH'] = sgedge_settings.ENV['GOPATH'].replace('~', sourcegraph_lib.get_home_path())
-=======
 		sg_settings.GOBIN = settings.get('GOBIN').rstrip(os.sep)
-	shell_gopath, err, return_code = sourcegraph_lib.run_native_shell_command(sg_settings.ENV.get('SHELL'), ['echo', '${GOPATH}'])
+	shell_gopath = sourcegraph_lib.find_gopath_from_shell(sg_settings.ENV.get('SHELL'))
 	if settings.has('GOPATH'):
 		sg_settings.ENV['GOPATH'] = str(settings.get('GOPATH').rstrip(os.sep)).strip()
 		sourcegraph_lib.log_output('[settings] Using GOPATH found in Sublime settings file: %s' % sg_settings.ENV['GOPATH'])
 	elif shell_gopath and shell_gopath.rstrip(os.sep).strip() != '':
 		sg_settings.ENV['GOPATH'] = shell_gopath.rstrip(os.sep).strip()
+		sourcegraph_lib.log_output('[settings] Using GOPATH from shell: %s' % sg_settings.ENV['GOPATH'])
 	elif find_gopath_from_gosublime():
 		sg_settings.ENV['GOPATH'] = find_gopath_from_gosublime()
 		sourcegraph_lib.log_output('[settings] Found GOPATH in GoSublime settings: %s' % sg_settings.ENV['GOPATH'])
 	if 'GOPATH' in sg_settings.ENV and sg_settings.ENV.get('GOPATH') != '':
-		sg_settings.ENV['GOPATH'] = sg_settings.ENV['GOPATH'].replace('~', os.environ.get('HOME'))
->>>>>>> master
+		sg_settings.ENV['GOPATH'] = sg_settings.ENV['GOPATH'].replace('~', sourcegraph_lib.get_home_path())
+
 	global SG_LIB_INSTANCE
 	SG_LIB_INSTANCE = sourcegraph_lib.Sourcegraph(sg_settings)
 	SG_LIB_INSTANCE.post_load()
