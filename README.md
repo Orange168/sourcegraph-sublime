@@ -40,7 +40,7 @@ Sourcegraph for Sublime has a number of flags to customize your experience. To c
 
 ### Custom GOBIN or GOPATH
 
-Sourcegraph for Sublime assumes a `GOBIN` of `/usr/local/bin/go`, and loads your `/bin/bash` startup scripts to search for the `GOPATH` environment variable. If your `GOPATH` is not defined in your startup scripts, Sourcegraph for Sublime then searches for GoSublime settings files for `GOPATH`. If Sourcegraph cannot find your `GOPATH`, or if you would like to use a custom `GOPATH` or `GOBIN`, add them in the settings file as follows:
+Sourcegraph for Sublime searches your shell to find `GOBIN`, the full path of the Go executable. This is typically `$GOROOT/bin/go`. Similarly, Sourcegraph loads your `/bin/bash` startup scripts to search for the `GOPATH` environment variable. If Sourcegraph cannot find your environment variables, or if you would like to use a custom `GOPATH` or `GOBIN`, add them in the settings file as follows:
 
 ```yml
 {
