@@ -253,10 +253,6 @@ class SourcegraphEdge(object):
 		return stderr, godefinfo_output
 
 	def add_gopath_to_path(self):
-		try:
-			os.listdir(self.settings.ENV.get('GOPATH'))
-		except:
-			return
 		if self.settings.ENV.get('GOPATH') != '' and self.settings.ENV.get('GOPATH'):
 			for gopath_loc in self.settings.ENV['GOPATH'].split(os.pathsep):
 				self.settings.ENV['PATH'] += os.pathsep + os.path.join(gopath_loc, 'bin')
