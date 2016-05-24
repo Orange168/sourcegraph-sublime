@@ -16,7 +16,7 @@ from test_data import Tests
 
 def start_default_instance():
     test_settings = sourcegraph_lib.Settings()
-    sourcegraph_lib_instance = sourcegraph_lib.SourcegraphEdge(test_settings)
+    sourcegraph_lib_instance = sourcegraph_lib.Sourcegraph(test_settings)
     sourcegraph_lib_instance.post_load()
     return sourcegraph_lib_instance
 
@@ -48,8 +48,8 @@ class VerifyGoodGopath(unittest.TestCase):
 
 
 class VerifyClearCacheOnHardReload(unittest.TestCase):
-    @patch('sourcegraph_lib.SourcegraphEdge.open_channel_os')
-    def test(self, mock_open_edge_channel):
+    @patch('sourcegraph_lib.Sourcegraph.open_channel_os')
+    def test(self, mock_open_channel):
         return
         sourcegraph_lib_instance = start_default_instance()
         self.assertIsNone(sourcegraph_lib_instance.LAST_SYMBOL_LOOKUP)
@@ -60,7 +60,7 @@ class VerifyClearCacheOnHardReload(unittest.TestCase):
         self.assertEqual(imported_struct_test.lookup_args.selected_token, sourcegraph_lib_instance.LAST_SYMBOL_LOOKUP)
         self.assertEqual(imported_struct_test.expected_output.Repo, sourcegraph_lib_instance.LAST_REPO_PACKAGE_LOOKUP)
 
-        sourcegraph_lib_instance.open_edge_channel(hard_refresh=True)
+        sourcegraph_lib_instance.open_channel(hard_refresh=True)
         self.assertIsNone(sourcegraph_lib_instance.LAST_SYMBOL_LOOKUP)
         self.assertIsNone(sourcegraph_lib_instance.LAST_REPO_PACKAGE_LOOKUP)
 
@@ -136,7 +136,7 @@ class VerifyGodefinfoAutoUpdate(unittest.TestCase):
         old_commit = self.git_commit(godefinfo_dir)
         self.assertNotEqual(current_commit, old_commit)
 
-        sourcegraph_lib.SourcegraphEdge(test_settings).post_load()
+        sourcegraph_lib.Sourcegraph(test_settings).post_load()
         self.assertEqual(current_commit, self.git_commit(godefinfo_dir))
 
 
