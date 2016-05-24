@@ -53,24 +53,24 @@ Sourcegraph for Sublime assumes a `GOBIN` of `/usr/local/bin/go`, and loads your
 
 ### Auto-process selection
 
-Sourcegraph automatically processes your code as you type. If you want to disable this feature, set the `AUTO_PROCESS` flag to `false`. If you disable it, you must press <kbd>&#8984;</kbd>+<kbd>,</kbd>, <kbd>&#8984;</kbd>+<kbd>0</kbd> to process your current selection.
+With the auto-process feature, Sourcegraph automatically processes your code as you type. If you want to toggle this feature, set the `AUTO_PROCESS` flag in your settings file. If you set it to `false`, you must press <kbd>&#8984;</kbd>+<kbd>,</kbd>, <kbd>&#8984;</kbd>+<kbd>0</kbd> to process your current selection.
 
 ```yml
 {
 	...
-	"AUTO_PROCESS": false,
+	"AUTO_PROCESS": true,
 	...
 }
 ```
 
 ### Auto-open browser
 
-This setting auto-opens the channel in your browser when you click on a definition in Go. If it is set to false, then you can access the channel by clicking <kbd>&#8984;</kbd>+<kbd>.</kbd>, <kbd>&#8984;</kbd>+<kbd>0</kbd>. To disable auto-opening, set the `AUTO_OPEN` flag to `false` in your settings:
+If set to `true`, this setting will auto-open the Sourcegraph channel in your browser when you click on a definition in Go. If it is set to `false`, then you can access the channel by clicking <kbd>&#8984;</kbd>+<kbd>.</kbd>, <kbd>&#8984;</kbd>+<kbd>0</kbd>. To disable auto-opening, set the `AUTO_OPEN` flag to `false` in your settings:
 
 ```yml
 {
 	...
-	"AUTO_OPEN": false,
+	"AUTO_OPEN": true,
 	...
 }
 ```
@@ -79,10 +79,13 @@ This setting auto-opens the channel in your browser when you click on a definiti
 
 This setting gives verbose output from Sourcegraph for Sublime to the Sublime Text console, which can be helping when troubleshooting Sourcegraph for Sublime. To open the Sublime console, simply type <kbd>control</kbd>+<kbd>`</kbd>. Different levels of logging are available:
 
-No logging: 0
-Only log symbols identified by godefinfo: 1
-Log network calls: 2
-Log all debugging information: 3
+No logging: `0`
+
+Only log symbols identified by godefinfo: `1`
+
+Log network calls: `2`
+
+Log all debugging information: `3`
 
 ```yml
 {
