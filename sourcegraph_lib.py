@@ -103,7 +103,10 @@ def run_shell_command(command, env):
 def run_native_shell_command(shell_env, command):
 	if isinstance(command, list):
 		command = " ".join(command)
-	native_command = [shell_env, '-i', '-l', '-c', command]
+	native_command = [shell_env]
+	if sys.platform == 'darwin':
+		native_command += ['-i']
+	native_command += ['-l', '-c', command]
 	if not shell_env or shell_env == '':
 		native_command = command.split()
 
