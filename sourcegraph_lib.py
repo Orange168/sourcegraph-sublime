@@ -46,9 +46,9 @@ def is_windows():
 
 def get_user_name():
 	if is_windows():
-		return os.environ.get('USER')
-	else:
 		return os.environ.get('USERNAME')
+	else:
+		return os.environ.get('USER')
 
 def get_home_path():
 	if is_windows():
