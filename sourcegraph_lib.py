@@ -234,6 +234,7 @@ class Sourcegraph(object):
 	def open_channel(self, hard_refresh=False):
 		if hard_refresh:
 			self.HAVE_OPENED_CHANNEL = True
+			self.EXPORTED_PARAMS_CACHE = None
 			global SG_CHANNEL
 			SG_CHANNEL = None
 
