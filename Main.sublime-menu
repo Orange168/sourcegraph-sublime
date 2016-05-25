@@ -69,7 +69,7 @@
 							},
 							{ "caption": "-" },
 							{
-								"caption": "Reopen Browser Tab",
+								"caption": "Reopen Channel",
 								"command": "sg_open_channel",
 							},
 							{ "caption": "-" },

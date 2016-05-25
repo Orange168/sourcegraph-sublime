@@ -32,7 +32,7 @@ git clone ssh://git@github.com/sourcegraph/sourcegraph-sublime
 
 ## Usage
 
-Sourcegraph for Sublime should automatically open a browser tab to initialize your Sourcegraph session when in Go files. If, for any reason, your tab gets closed, press <kbd>ctrl</kbd><kbd>alt</kbd><kbd>o</kbd> in any file to reopen the Sourcegraph tab. Alternatively, you can click on `Sublime Text > Preferences > Package Settings > Sourcegraph > Reopen Browser Tab`. As you navigate through Go files, your browser should automatically load the definition and references for recognized symbols.
+Sourcegraph for Sublime opens a channel in your browser to initialize your Sourcegraph session when in Go files. If, for any reason, your channel gets closed, press <kbd>ctrl</kbd><kbd>alt</kbd><kbd>o</kbd> in any file to reopen the Sourcegraph channel. Alternatively, you can click on `Sublime Text > Preferences > Package Settings > Sourcegraph > Reopen Channel`. As you navigate through Go files, press <kbd>ctrl</kbd><kbd>alt</kbd><kbd>j</kbd> when your cursor is on a symbol to load its definition and references across thousands of public Go repositories.
 
 ## Flags
 
