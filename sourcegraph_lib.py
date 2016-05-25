@@ -457,8 +457,9 @@ def check_gopath(env):
 	if 'GOPATH' not in env:
 		return ERR_GOPATH_UNDEFINED
 
-	out, err, return_code = run_shell_command(["ls", env['GOPATH']], env)
-	if return_code != 0:
+	try:
+		os.listdir(env['GOPATH'])
+	except:
 		return ERR_GOPATH_UNDEFINED
 
 def check_go(settings):
