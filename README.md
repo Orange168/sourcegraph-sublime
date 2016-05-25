@@ -32,7 +32,7 @@ git clone ssh://git@github.com/sourcegraph/sourcegraph-sublime
 
 ## Usage
 
-Sourcegraph for Sublime should automatically open a browser tab to initialize your Sourcegraph session when in Go files. If, for any reason, your tab gets closed, press <kbd>&#8984;</kbd>+<kbd>.</kbd>, <kbd>&#8984;</kbd>+<kbd>0</kbd> in any file to reopen the Sourcegraph tab. Alternatively, you can click on `Sublime Text > Preferences > Package Settings > Sourcegraph > Reopen Browser Tab`. As you navigate through Go files, your browser should automatically load the definition and references for recognized symbols.
+Sourcegraph for Sublime should automatically open a browser tab to initialize your Sourcegraph session when in Go files. If, for any reason, your tab gets closed, press <kbd>ctrl</kbd><kbd>alt</kbd><kbd>o</kbd> in any file to reopen the Sourcegraph tab. Alternatively, you can click on `Sublime Text > Preferences > Package Settings > Sourcegraph > Reopen Browser Tab`. As you navigate through Go files, your browser should automatically load the definition and references for recognized symbols.
 
 ## Flags
 
@@ -53,7 +53,7 @@ Sourcegraph for Sublime searches your shell to find `GOBIN`, the full path of yo
 
 ### Auto-process selection
 
-With the auto-process feature, Sourcegraph automatically processes your code as you type. If you want to toggle this feature, set the `AUTO_PROCESS` flag in your settings file. If you set it to `false`, you must press <kbd>&#8984;</kbd>+<kbd>,</kbd>, <kbd>&#8984;</kbd>+<kbd>0</kbd> to process your current selection.
+With the auto-process feature, Sourcegraph automatically processes your code as you type. If you want to toggle this feature, set the `AUTO_PROCESS` flag in your settings file. If you set it to `false`, you must press <kbd>ctrl</kbd><kbd>alt</kbd><kbd>j</kbd> to process your current selection.
 
 ```yml
 {
@@ -65,7 +65,7 @@ With the auto-process feature, Sourcegraph automatically processes your code as 
 
 ### Auto-open browser
 
-If set to `true`, this setting will auto-open the Sourcegraph channel in your browser when you click on a definition in Go. If it is set to `false`, then you can access the channel by clicking <kbd>&#8984;</kbd>+<kbd>.</kbd>, <kbd>&#8984;</kbd>+<kbd>0</kbd>. To disable auto-opening, set the `AUTO_OPEN` flag to `false` in your settings:
+If set to `true`, this setting will auto-open the Sourcegraph channel in your browser when you click on a definition in Go. If it is set to `false`, then you can access the channel by clicking <kbd>ctrl</kbd><kbd>alt</kbd><kbd>o</kbd>. To disable auto-opening, set the `AUTO_OPEN` flag to `false` in your settings:
 
 ```yml
 {
