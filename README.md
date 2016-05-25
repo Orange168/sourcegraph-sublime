@@ -55,7 +55,7 @@ Sourcegraph for Sublime searches your shell to find `GOBIN`, the full path of yo
 
 ### Auto-process selection
 
-When the auto-process feature is enabled, Sourcegraph automatically processes your code as you type. If you want to toggle this feature, set the `AUTO_PROCESS` flag in your settings file. If you set it to `false`, you must press <kbd>ctrl</kbd><kbd>alt</kbd><kbd>j</kbd> to process your current selection.
+When the auto-process feature is enabled, Sourcegraph automatically processes your code as you type. If you want to toggle this feature, set the `AUTO_PROCESS` flag to `true` in your settings file. If you set it to `false`, you must press <kbd>ctrl</kbd><kbd>alt</kbd><kbd>j</kbd> to process your current selection.
 
 ```yml
 {
