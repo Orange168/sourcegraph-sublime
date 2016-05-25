@@ -4,9 +4,9 @@ import sys
 import unittest
 
 try:
-    from unittest.mock import patch
+    from unittest import mock
 except:
-    from mock import patch
+    import mock
 
 sys.path.append(os.path.dirname(__file__))
 import sourcegraph_lib
@@ -51,9 +51,9 @@ class VerifyGoodGopath(unittest.TestCase):
 
 
 class VerifyClearCacheOnHardReload(unittest.TestCase):
-    @patch('sourcegraph_lib.Sourcegraph.open_channel_os')
-    def test(self, mock_open_channel):
+    def test(self):
         sourcegraph_lib_instance = start_default_instance()
+        sourcegraph_lib_instance.open_channel_os = mock.Mock()
         self.assertIsNone(sourcegraph_lib_instance.EXPORTED_PARAMS_CACHE)
         self.assertEqual(sourcegraph_lib_instance.HAVE_OPENED_CHANNEL, False)
 
