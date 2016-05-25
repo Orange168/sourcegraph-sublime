@@ -33,11 +33,11 @@ class Error(object):
 	def __str__(self):
 		return "%s : %s" % (self.title, self.description)
 
-ERR_GOPATH_UNDEFINED = Error('GOPATH Undefined', 'Could not find GOPATH in your shell startup scripts or Sublime settings. Please read the GOPATH section in the Sourcegraph Sublime README <a>https://github.com/sourcegraph/sourcegraph-sublime</a> to learn how to set your GOPATH.')
-ERR_GODEFINFO_INSTALL = Error('godefinfo binary not found in your PATH', 'Please read the Installation section in the Sourcegraph Sublime README https://github.com/sourcegraph/sourcegraph-sublime to learn how to install godefinfo.')
-ERR_GO_BINARY = Error('Go binary not found in your PATH', 'Please read the GOBIN section in the Sourcegraph Sublime README https://github.com/sourcegraph/sourcegraph-sublime to learn how to set your GOBIN.')
-ERR_GO_VERSION = Error('Go version is < 1.6', 'Sourcegraph Sublime only works with Go 1.6 and greater.')
-ERR_UNRECOGNIZED_SHELL = Error('Sourcegraph for Sublime can\'t execute commands against your shell', 'Contact Sourcegraph with your OS details, and we\'ll try to deliver Sourcegraph for your OS')
+ERR_GOPATH_UNDEFINED = Error('GOPATH Error', 'No valid GOPATH found in your shell startup scripts or Sublime settings. Please read the GOPATH section in the Sourcegraph Sublime README to learn how to manually set your GOPATH.')
+ERR_GODEFINFO_INSTALL = Error('godefinfo binary not found', 'We could not find godefinfo in your PATH. Please read the godefinfo section in the Sourcegraph Sublime README to learn how to install godefinfo.')
+ERR_GO_BINARY = Error('Go binary not found in your PATH', 'We could not find a Go binary in your PATH. Please read the GOBIN section in the Sourcegraph Sublime README to learn how to manually set your GOBIN.')
+ERR_GO_VERSION = Error('Go version is < 1.6', 'Sourcegraph Sublime only works with Go 1.6 and greater. Please install Go 1.6.')
+ERR_UNRECOGNIZED_SHELL = Error('Sourcegraph for Sublime can\'t execute commands against your shell', 'Contact Sourcegraph with your OS details, and we\'ll try to deliver Sourcegraph for your OS.')
 
 def ERR_SYMBOL_NOT_FOUND(symbol):
 	return Error('Could not find symbol "%s".' % symbol, 'Please make sure you have selected a valid symbol, and have all imported packages installed on your computer.')
