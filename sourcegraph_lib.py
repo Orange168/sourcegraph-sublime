@@ -22,6 +22,7 @@ LOG_ALL = 3
 
 LOG_LEVEL = LOG_NONE
 SG_LOG_FILE = '/tmp/sourcegraph-sublime.log'
+SG_CHANNEL = None
 
 
 class Error(object):
@@ -32,11 +33,11 @@ class Error(object):
 	def __str__(self):
 		return "%s : %s" % (self.title, self.description)
 
-ERR_GOPATH_UNDEFINED = Error('GOPATH Undefined', 'Could not find GOPATH in your shell startup scripts or Sublime settings. Please read the GOPATH section in the Sourcegraph Sublime README https://github.com/sourcegraph/sourcegraph-sublime to learn how to set your GOPATH.')
-ERR_GODEFINFO_INSTALL = Error('godefinfo binary not found in your PATH', 'Please read the Installation section in the Sourcegraph Sublime README https://github.com/sourcegraph/sourcegraph-sublime to learn how to install godefinfo.')
-ERR_GO_BINARY = Error('Go binary not found in your PATH', 'Please read the GOBIN section in the Sourcegraph Sublime README https://github.com/sourcegraph/sourcegraph-sublime to learn how to set your GOBIN.')
-ERR_GO_VERSION = Error('Go version is < 1.6', 'Sourcegraph Sublime only works with Go 1.6 and greater.')
-ERR_UNRECOGNIZED_SHELL = Error('Sourcegraph for Sublime can\'t execute commands against your shell', 'Contact Sourcegraph with your OS details, and we\'ll try to deliver Sourcegraph for your OS')
+ERR_GOPATH_UNDEFINED = Error('GOPATH Error', 'No valid GOPATH found in your shell startup scripts or Sublime settings. Please read the GOPATH section in the Sourcegraph Sublime README to learn how to manually set your GOPATH.')
+ERR_GODEFINFO_INSTALL = Error('godefinfo binary not found', 'We could not find godefinfo in your PATH. Please read the godefinfo section in the Sourcegraph Sublime README to learn how to install godefinfo.')
+ERR_GO_BINARY = Error('Go binary not found in your PATH', 'We could not find a Go binary in your PATH. Please read the GOBIN section in the Sourcegraph Sublime README to learn how to manually set your GOBIN.')
+ERR_GO_VERSION = Error('Go version is < 1.6', 'Sourcegraph Sublime only works with Go 1.6 and greater. Please install Go 1.6.')
+ERR_UNRECOGNIZED_SHELL = Error('Sourcegraph for Sublime can\'t execute commands against your shell', 'Contact Sourcegraph with your OS details, and we\'ll try to deliver Sourcegraph for your OS.')
 
 def ERR_SYMBOL_NOT_FOUND(symbol):
 	return Error('Could not find symbol "%s".' % symbol, 'Please make sure you have selected a valid symbol, and have all imported packages installed on your computer.')
@@ -46,9 +47,9 @@ def is_windows():
 
 def get_user_name():
 	if is_windows():
-		return os.environ.get('USER')
-	else:
 		return os.environ.get('USERNAME')
+	else:
+		return os.environ.get('USER')
 
 def get_home_path():
 	if is_windows():
@@ -103,7 +104,10 @@ def run_shell_command(command, env):
 def run_native_shell_command(shell_env, command):
 	if isinstance(command, list):
 		command = " ".join(command)
-	native_command = [shell_env, '--login', '-l', '-c', command]
+	native_command = [shell_env]
+	if 'zsh' in shell_env:
+		native_command += ['-i']
+	native_command += ['-l', '-c', command]
 	if not shell_env or shell_env == '':
 		native_command = command.split()
 
@@ -187,7 +191,7 @@ class Sourcegraph(object):
 		if not self.HAVE_OPENED_CHANNEL and self.settings.AUTO_OPEN:
 			self.open_channel()
 			self.HAVE_OPENED_CHANNEL = True
-		post_url = '%s/.api/channel/%s' % (self.settings.SG_SEND_URL, self.settings.SG_CHANNEL)
+		post_url = '%s/.api/channel/%s' % (self.settings.SG_SEND_URL, SG_CHANNEL)
 		self.send_curl_request_network(post_url, exported_params.to_json())
 
 	def send_curl_request_network(self, post_url, json_arguments):
@@ -213,8 +217,8 @@ class Sourcegraph(object):
 				self.IS_OPENING_CHANNEL = False
 
 	def open_channel_os(self):
-		self.get_channel()
-		command = ['%s/-/channel/%s' % (self.settings.SG_BASE_URL, self.settings.SG_CHANNEL)]
+		get_channel()
+		command = ['%s/-/channel/%s' % (self.settings.SG_BASE_URL, SG_CHANNEL)]
 		if sys.platform.startswith('linux'):
 			command.insert(0, 'xdg-open')
 		elif sys.platform == 'darwin':
@@ -230,6 +234,9 @@ class Sourcegraph(object):
 	def open_channel(self, hard_refresh=False):
 		if hard_refresh:
 			self.HAVE_OPENED_CHANNEL = True
+			self.EXPORTED_PARAMS_CACHE = None
+			global SG_CHANNEL
+			SG_CHANNEL = None
 
 		self.open_channel_os()
 
@@ -267,13 +274,14 @@ class Sourcegraph(object):
 			log_output("[settings] Cannot find GOPATH, notifying error API.")
 			return ExportedParams(Error=ERR_GOPATH_UNDEFINED.title, Fix=ERR_GOPATH_UNDEFINED.description)
 
-	def get_channel(self):
-		if self.settings.SG_CHANNEL is None:
-			self.settings.SG_CHANNEL = '%s-%06x%06x%06x%06x%06x%06x' % \
-				(get_user_name(), random.randrange(16**6), random.randrange(16**6),
-					random.randrange(16**6), random.randrange(16**6), random.randrange(16**6), random.randrange(16**6))
-		else:
-			log_output('Using existing channel: %s' % self.settings.SG_CHANNEL)
+def get_channel():
+	global SG_CHANNEL
+	if SG_CHANNEL is None:
+		SG_CHANNEL = '%s-%06x%06x%06x%06x%06x%06x' % \
+			(get_user_name(), random.randrange(16**6), random.randrange(16**6),
+				random.randrange(16**6), random.randrange(16**6), random.randrange(16**6), random.randrange(16**6))
+	else:
+		log_output('Using existing channel: %s' % SG_CHANNEL)
 
 
 class LookupArgs(object):
@@ -320,10 +328,9 @@ class Settings(object):
 		self.SG_BASE_URL = 'https://sourcegraph.com'
 		self.SG_SEND_URL = 'https://grpc.sourcegraph.com'
 		self.ENV = os.environ.copy()
-		self.AUTO_OPEN = True
-		self.AUTO_PROCESS = True
+		self.AUTO_OPEN = False
+		self.AUTO_PROCESS = False
 		self.ENABLE_LOOKBACK = True
-		self.SG_CHANNEL = None
 		self.GOBIN = find_gobin(self.ENV.get('SHELL'))
 		self.__dict__.update(kwds)
 

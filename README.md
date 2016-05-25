@@ -32,15 +32,17 @@ git clone ssh://git@github.com/sourcegraph/sourcegraph-sublime
 
 ## Usage
 
-Sourcegraph for Sublime should automatically open a browser tab to initialize your Sourcegraph session when in Go files. If, for any reason, your tab gets closed, press <kbd>&#8984;</kbd>+<kbd>.</kbd>, <kbd>&#8984;</kbd>+<kbd>0</kbd> in any file to reopen the Sourcegraph tab. Alternatively, you can click on `Sublime Text > Preferences > Package Settings > Sourcegraph > Reopen Browser Tab`. As you navigate through Go files, your browser should automatically load the definition and references for recognized symbols.
+Sourcegraph for Sublime opens a channel in your browser to initialize your Sourcegraph session when in Go files. If, for any reason, your channel gets closed, press <kbd>ctrl</kbd><kbd>alt</kbd><kbd>o</kbd> in any file to reopen the Sourcegraph channel. Alternatively, you can click on `Sublime Text > Preferences > Package Settings > Sourcegraph > Reopen Channel`. As you navigate through Go files, press <kbd>ctrl</kbd><kbd>alt</kbd><kbd>j</kbd> when your cursor is on a symbol to load its definition and references across thousands of public Go repositories.
 
 ## Flags
 
 Sourcegraph for Sublime has a number of flags to customize your experience. To change your Sourcegraph settings, open `Sourcegraph.sublime-settings` by clicking `Sublime Text > Preferences > Package Settings > Sourcegraph > Settings - User`.
 
-### Custom GOBIN or GOPATH
+### GOBIN and GOPATH
 
-Sourcegraph for Sublime assumes a `GOBIN` of `/usr/local/bin/go`, and loads your `/bin/bash` startup scripts to search for the `GOPATH` environment variable. If your `GOPATH` is not defined in your startup scripts, Sourcegraph for Sublime then searches for GoSublime settings files for `GOPATH`. If Sourcegraph cannot find your `GOPATH`, or if you would like to use a custom `GOPATH` or `GOBIN`, add them in the settings file as follows:
+To learn more about setting your `GOPATH`, please click [here](https://golang.org/doc/code.html#GOPATH).
+
+Sourcegraph for Sublime searches your shell to find `GOBIN`, the full path of your Go executable. This is typically `$GOROOT/bin/go`. Similarly, Sourcegraph loads your `/bin/bash` startup scripts to search for the `GOPATH` environment variable. If Sourcegraph cannot find your environment variables, or if you would like to use a custom `GOPATH` or `GOBIN`, add them in the settings file as follows:
 
 ```yml
 {
@@ -53,24 +55,24 @@ Sourcegraph for Sublime assumes a `GOBIN` of `/usr/local/bin/go`, and loads your
 
 ### Auto-process selection
 
-Sourcegraph automatically processes your code as you type. If you want to disable this feature, set the `AUTO_PROCESS` flag to `false`. If you disable it, you must press <kbd>&#8984;</kbd>+<kbd>,</kbd>, <kbd>&#8984;</kbd>+<kbd>0</kbd> to process your current selection.
+When the auto-process feature is enabled, Sourcegraph automatically processes your code as you type. If you want to toggle this feature, set the `AUTO_PROCESS` flag to `true` in your settings file. If you set it to `false`, you must press <kbd>ctrl</kbd><kbd>alt</kbd><kbd>j</kbd> to process your current selection.
 
 ```yml
 {
 	...
-	"AUTO_PROCESS": false,
+	"AUTO_PROCESS": true,
 	...
 }
 ```
 
 ### Auto-open browser
 
-This setting auto-opens the channel in your browser when you click on a definition in Go. If it is set to false, then you can access the channel by clicking <kbd>&#8984;</kbd>+<kbd>.</kbd>, <kbd>&#8984;</kbd>+<kbd>0</kbd>. To disable auto-opening, set the `AUTO_OPEN` flag to `false` in your settings:
+If set to `true`, this setting will auto-open the Sourcegraph channel in your browser when you click on a definition in Go. If it is set to `false`, then you can access the channel by clicking <kbd>ctrl</kbd><kbd>alt</kbd><kbd>o</kbd>. To disable auto-opening, set the `AUTO_OPEN` flag to `false` in your settings.
 
 ```yml
 {
 	...
-	"AUTO_OPEN": false,
+	"AUTO_OPEN": true,
 	...
 }
 ```
@@ -79,10 +81,13 @@ This setting auto-opens the channel in your browser when you click on a definiti
 
 This setting gives verbose output from Sourcegraph for Sublime to the Sublime Text console, which can be helping when troubleshooting Sourcegraph for Sublime. To open the Sublime console, simply type <kbd>control</kbd>+<kbd>`</kbd>. Different levels of logging are available:
 
-No logging: 0
-Only log symbols identified by godefinfo: 1
-Log network calls: 2
-Log all debugging information: 3
+No logging: `0`
+
+Only log symbols identified by godefinfo: `1`
+
+Log network calls: `2`
+
+Log all debugging information: `3`
 
 ```yml
 {

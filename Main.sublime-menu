@@ -60,9 +60,16 @@
 									"file": "${packages}/sourcegraph-sublime/README.md"
 								}
 							},
+							{
+								"caption": "License (MIT)",
+								"command": "open_file",
+								"args": {
+									"file": "${packages}/sourcegraph-sublime/LICENSE.md"
+								}
+							},
 							{ "caption": "-" },
 							{
-								"caption": "Reopen Browser Tab",
+								"caption": "Reopen Channel",
 								"command": "sg_open_channel",
 							},
 							{ "caption": "-" },

@@ -66,7 +66,7 @@ def reload_settings():
 	settings = sublime.load_settings(SETTINGS_FILENAME)
 	load_settings(settings)
 	if SG_LIB_INSTANCE.settings.SG_BASE_URL != old_base_url and SG_LIB_INSTANCE.settings.AUTO_OPEN:
-		SG_LIB_INSTANCE.open_channel()
+		SG_LIB_INSTANCE.open_channel(hard_refresh=True)
 
 
 def plugin_loaded():

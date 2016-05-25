@@ -8,14 +8,15 @@
 	/*
 	This setting allows you to use channels on a local version of Sourcegraph.
 	*/
-	"SG_BASE_URL": "https://grpc.sourcegraph.com",
+	"SG_BASE_URL": "https://sourcegraph.com",
+	"SG_SEND_URL": "https://grpc.sourcegraph.com",
 
 	/*
-	This setting auto-opens the Sourcegraph channel in your browser when you click on a
-	definition in Go. If it is set to false, then you can access your Sourcegraph channel
-	by clicking [ctrl+., ctrl+0].
+	This setting toggles the auto-opening feature for the Sourcegraph channel in your browser
+	when you click on a definition in Go. If it is set to false, then you can access your
+	Sourcegraph channel by clicking [ctrl+., ctrl+0].
 	*/
-	"AUTO_OPEN": true,
+	"AUTO_OPEN": false,
 
 	/*
 	This setting gives logs output from Sourcegraph Sublime to the
@@ -37,8 +38,8 @@
 	"ENABLE_LOOKBACK": true,
 
 	/*
-	This setting allows you to disable Sourcegraph's auto-processing feature. If you disable
-	it, you must press [ctrl+, , ctrl+0] to process your current selection on Sourcegraph.
+	This setting allows you to toggle Sourcegraph's auto-processing feature. If set to
+	false, you must press [ctrl+, , ctrl+0] to process your current selection on Sourcegraph.
 	*/
-	"AUTO_PROCESS": true
+	"AUTO_PROCESS": false
 }
