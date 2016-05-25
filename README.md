@@ -38,7 +38,9 @@ Sourcegraph for Sublime should automatically open a browser tab to initialize yo
 
 Sourcegraph for Sublime has a number of flags to customize your experience. To change your Sourcegraph settings, open `Sourcegraph.sublime-settings` by clicking `Sublime Text > Preferences > Package Settings > Sourcegraph > Settings - User`.
 
-### Custom GOBIN or GOPATH
+### GOBIN and GOPATH
+
+To learn more about setting your `GOPATH`, please click [here](https://golang.org/doc/code.html#GOPATH).
 
 Sourcegraph for Sublime searches your shell to find `GOBIN`, the full path of your Go executable. This is typically `$GOROOT/bin/go`. Similarly, Sourcegraph loads your `/bin/bash` startup scripts to search for the `GOPATH` environment variable. If Sourcegraph cannot find your environment variables, or if you would like to use a custom `GOPATH` or `GOBIN`, add them in the settings file as follows:
 
