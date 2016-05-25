@@ -26,5 +26,13 @@
 		"args": {
 			"file": "${packages}/sourcegraph-sublime/LICENSE.md"
 		}
+	},
+	{
+		"caption": "Sourcegraph: Open New Channel",
+		"command": "sg_open_channel"
+	},
+	{
+		"caption": "Sourcegraph: Define Current Symbol",
+		"command": "sg_manual_process"
 	}
 ]
