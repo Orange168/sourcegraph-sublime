@@ -67,7 +67,7 @@ When the auto-process feature is enabled, Sourcegraph automatically processes yo
 
 ### Auto-open browser
 
-If set to `true`, this setting will auto-open the Sourcegraph channel in your browser when you click on a definition in Go. If it is set to `false`, then you can access the channel by clicking <kbd>ctrl</kbd><kbd>alt</kbd><kbd>o</kbd>. To disable auto-opening, set the `AUTO_OPEN` flag to `false` in your settings:
+If set to `true`, this setting will auto-open the Sourcegraph channel in your browser when you click on a definition in Go. If it is set to `false`, then you can access the channel by clicking <kbd>ctrl</kbd><kbd>alt</kbd><kbd>o</kbd>. To disable auto-opening, set the `AUTO_OPEN` flag to `false` in your settings.
 
 ```yml
 {
