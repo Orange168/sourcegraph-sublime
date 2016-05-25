@@ -1,9 +1,9 @@
 Sourcegraph Sublime
 ===================
 
-  Thank you for installing Sourcegraph Sublime!
+  Thank you for installing Sourcegraph for Sublime!
 
-  To begin using Sourcegraph Sublime, open any Go file and select a symbol, then press ctrl + alt + j.
+  To begin using Sourcegraph for Sublime, open any Go file and select a symbol, then press ctrl + alt + j.
 
 
 
