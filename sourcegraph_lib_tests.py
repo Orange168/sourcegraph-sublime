@@ -28,8 +28,11 @@ def check_output(test_case_class, test_output, expected_output):
     test_case_class.assertEqual(expected_output, test_output)
 
 
+def full_test_filename(test_name, gopath):
+    return os.path.join(gopath, 'src', 'github.com', 'luttig', 'sg-live-plugin-tests', 'go_tests', test_name)
+
 def run_go_test(test, sourcegraph_lib_instance):
-    full_filename = os.path.join(sourcegraph_lib_instance.settings.ENV['GOPATH'], 'src', 'github.com', 'luttig', 'sg-live-plugin-tests', 'go_tests', test.lookup_args.filename)
+    full_filename = full_test_filename(test.lookup_args.filename, sourcegraph_lib_instance.settings.ENV['GOPATH'])
     buff = b''
     if test.lookup_args.filename != '' and test.lookup_args.filename != '.go':
         try:
@@ -50,19 +53,31 @@ class VerifyGoodGopath(unittest.TestCase):
 class VerifyClearCacheOnHardReload(unittest.TestCase):
     @patch('sourcegraph_lib.Sourcegraph.open_channel_os')
     def test(self, mock_open_channel):
-        return
         sourcegraph_lib_instance = start_default_instance()
-        self.assertIsNone(sourcegraph_lib_instance.LAST_SYMBOL_LOOKUP)
-        self.assertIsNone(sourcegraph_lib_instance.LAST_REPO_PACKAGE_LOOKUP)
+        self.assertIsNone(sourcegraph_lib_instance.EXPORTED_PARAMS_CACHE)
+        self.assertEqual(sourcegraph_lib_instance.HAVE_OPENED_CHANNEL, False)
 
         imported_struct_test = Tests().IMPORTED_STRUCT
-        run_go_test(imported_struct_test, sourcegraph_lib_instance)
-        self.assertEqual(imported_struct_test.lookup_args.selected_token, sourcegraph_lib_instance.LAST_SYMBOL_LOOKUP)
-        self.assertEqual(imported_struct_test.expected_output.Repo, sourcegraph_lib_instance.LAST_REPO_PACKAGE_LOOKUP)
+        imported_struct_test.lookup_args.filename = full_test_filename(imported_struct_test.lookup_args.filename, sourcegraph_lib_instance.settings.ENV['GOPATH'])
+        buff = b''
+        try:
+            with open(imported_struct_test.lookup_args.filename, 'r') as test_file:
+                buff = test_file.read().encode()
+        except:
+            pass
+        imported_struct_test.lookup_args.preceding_selection = buff
+        sourcegraph_lib_instance.on_selection_modified_handler(imported_struct_test.lookup_args)
+        self.assertEqual(sourcegraph_lib_instance.HAVE_OPENED_CHANNEL, False)
+        self.assertEqual(sourcegraph_lib_instance.EXPORTED_PARAMS_CACHE, imported_struct_test.expected_output)
 
         sourcegraph_lib_instance.open_channel(hard_refresh=True)
-        self.assertIsNone(sourcegraph_lib_instance.LAST_SYMBOL_LOOKUP)
-        self.assertIsNone(sourcegraph_lib_instance.LAST_REPO_PACKAGE_LOOKUP)
+        self.assertIsNone(sourcegraph_lib_instance.EXPORTED_PARAMS_CACHE)
+        self.assertEqual(sourcegraph_lib_instance.HAVE_OPENED_CHANNEL, True)
+
+        sourcegraph_lib_instance.settings.AUTO_OPEN = True
+        sourcegraph_lib_instance.on_selection_modified_handler(imported_struct_test.lookup_args)
+        self.assertEqual(sourcegraph_lib_instance.HAVE_OPENED_CHANNEL, True)
+        self.assertEqual(sourcegraph_lib_instance.EXPORTED_PARAMS_CACHE, imported_struct_test.expected_output)
 
 
 class VerifySyntaxVarieties(unittest.TestCase):
