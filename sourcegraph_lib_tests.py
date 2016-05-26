@@ -67,14 +67,14 @@ class VerifyClearCacheOnHardReload(unittest.TestCase):
             pass
         imported_struct_test.lookup_args.preceding_selection = buff
         sourcegraph_lib_instance.on_selection_modified_handler(imported_struct_test.lookup_args)
-        self.assertEqual(sourcegraph_lib_instance.HAVE_OPENED_CHANNEL, False)
+        self.assertEqual(sourcegraph_lib_instance.HAVE_OPENED_CHANNEL, True)
         self.assertEqual(sourcegraph_lib_instance.EXPORTED_PARAMS_CACHE, imported_struct_test.expected_output)
 
         sourcegraph_lib_instance.open_channel(hard_refresh=True)
         self.assertIsNone(sourcegraph_lib_instance.EXPORTED_PARAMS_CACHE)
         self.assertEqual(sourcegraph_lib_instance.HAVE_OPENED_CHANNEL, True)
 
-        sourcegraph_lib_instance.settings.AUTO_OPEN = True
+        sourcegraph_lib_instance.settings.AUTO = True
         sourcegraph_lib_instance.on_selection_modified_handler(imported_struct_test.lookup_args)
         self.assertEqual(sourcegraph_lib_instance.HAVE_OPENED_CHANNEL, True)
         self.assertEqual(sourcegraph_lib_instance.EXPORTED_PARAMS_CACHE, imported_struct_test.expected_output)

@@ -145,7 +145,7 @@ class Sourcegraph(object):
 		return_object = self.get_sourcegraph_request(lookup_args.filename, lookup_args.cursor_offset, lookup_args.preceding_selection, lookup_args.selected_token)
 		if return_object:
 			self.send_curl_request(return_object)
-		elif not self.settings.AUTO_PROCESS:
+		elif not self.settings.AUTO:
 			self.send_curl_request(ExportedParams(Error=ERR_SYMBOL_NOT_FOUND(lookup_args.selected_token).title, Fix=ERR_SYMBOL_NOT_FOUND(lookup_args.selected_token).description))
 
 	def get_sourcegraph_request(self, filename, cursor_offset, preceding_selection, selected_token):
@@ -188,7 +188,7 @@ class Sourcegraph(object):
 		if self.EXPORTED_PARAMS_CACHE == exported_params:
 			return
 		self.EXPORTED_PARAMS_CACHE = exported_params
-		if not self.HAVE_OPENED_CHANNEL and self.settings.AUTO_OPEN:
+		if not self.HAVE_OPENED_CHANNEL:
 			self.open_channel()
 			self.HAVE_OPENED_CHANNEL = True
 		post_url = '%s/.api/channel/%s' % (self.settings.SG_SEND_URL, SG_CHANNEL)
@@ -208,7 +208,7 @@ class Sourcegraph(object):
 			log_output('[network] Server responded with code %s' % str(status_code), is_network=True)
 			f.close()
 		except HTTPError as err:
-			if self.settings.AUTO_OPEN and not self.IS_OPENING_CHANNEL:
+			if not self.IS_OPENING_CHANNEL:
 				self.IS_OPENING_CHANNEL = True
 				log_output('[network] Server responded with err code %s, reopening browser.' % str(err.code), is_network=True)
 				self.open_channel(hard_refresh=True)
@@ -328,8 +328,7 @@ class Settings(object):
 		self.SG_BASE_URL = 'https://sourcegraph.com'
 		self.SG_SEND_URL = 'https://grpc.sourcegraph.com'
 		self.ENV = os.environ.copy()
-		self.AUTO_OPEN = False
-		self.AUTO_PROCESS = False
+		self.AUTO = False
 		self.ENABLE_LOOKBACK = True
 		self.GOBIN = find_gobin(self.ENV.get('SHELL'))
 		self.__dict__.update(kwds)

@@ -37,10 +37,8 @@ def load_settings(settings):
 		sg_settings.SG_SEND_URL = settings.get('SG_SEND_URL').rstrip('/')
 	if settings.has('SG_LOG_FILE'):
 		sourcegraph_lib.SG_LOG_FILE = settings.get('SG_LOG_FILE')
-	if settings.has('AUTO_OPEN'):
-		sg_settings.AUTO_OPEN = settings.get('AUTO_OPEN')
-	if settings.has('AUTO_PROCESS'):
-		sg_settings.AUTO_PROCESS = settings.get('AUTO_PROCESS')
+	if settings.has('AUTO'):
+		sg_settings.AUTO = settings.get('AUTO')
 	if settings.has('GOBIN'):
 		sg_settings.GOBIN = settings.get('GOBIN').rstrip(os.sep)
 	shell_gopath = sourcegraph_lib.find_gopath_from_shell(sg_settings.ENV.get('SHELL'))
@@ -65,7 +63,7 @@ def reload_settings():
 	old_base_url = SG_LIB_INSTANCE.settings.SG_BASE_URL
 	settings = sublime.load_settings(SETTINGS_FILENAME)
 	load_settings(settings)
-	if SG_LIB_INSTANCE.settings.SG_BASE_URL != old_base_url and SG_LIB_INSTANCE.settings.AUTO_OPEN:
+	if SG_LIB_INSTANCE.settings.SG_BASE_URL != old_base_url and SG_LIB_INSTANCE.settings.AUTO:
 		SG_LIB_INSTANCE.open_channel(hard_refresh=True)
 
 
@@ -119,5 +117,5 @@ class SgAutoProcessCommand(sublime_plugin.EventListener):
 		super().__init__()
 
 	def on_selection_modified_async(self, view):
-		if SG_LIB_INSTANCE.settings.AUTO_PROCESS:
+		if SG_LIB_INSTANCE.settings.AUTO:
 			process_selection(view)
