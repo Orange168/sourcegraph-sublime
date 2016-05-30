@@ -114,7 +114,7 @@ class VerifyGoBinaryError(unittest.TestCase):
     def test(self):
         sourcegraph_lib_instance = start_default_instance()
         sourcegraph_lib_instance.settings.GOBIN = '/path/not/to/gobin'
-        test_output = sourcegraph_lib.godefinfo_auto_install(sourcegraph_lib_instance.settings.GOBIN, sourcegraph_lib_instance.settings.ENV)
+        test_output = sourcegraph_lib.godefinfo_auto_install(sourcegraph_lib_instance.settings.GOBIN, sourcegraph_lib_instance.settings.ENV, True)
         self.assertEqual(test_output.Error, sourcegraph_lib.ERR_GO_BINARY.title)
         self.assertEqual(test_output.Fix, sourcegraph_lib.ERR_GO_BINARY.description)
 

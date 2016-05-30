@@ -125,9 +125,9 @@ class Sourcegraph(object):
 		self.EXPORTED_PARAMS_CACHE = None
 		self.settings = settings
 
-	def post_load(self):
+	def post_load(self, godefinfo_update=True):
 		setup_logging()
-		error_loading = self.add_gopath_to_path()
+		error_loading = self.add_gopath_to_path(godefinfo_update)
 		if type(error_loading) is ExportedParams:
 			self.send_curl_request(error_loading)
 		log_output('[settings] env: %s' % str(self.settings.ENV))
@@ -254,7 +254,7 @@ class Sourcegraph(object):
 			stderr = b'FileNotFoundError'
 		return stderr, godefinfo_output
 
-	def add_gopath_to_path(self):
+	def add_gopath_to_path(self, godefinfo_update=True):
 		gopath_err = check_gopath(self.settings.ENV)
 		if gopath_err:
 			return gopath_err
@@ -264,7 +264,7 @@ class Sourcegraph(object):
 		if self.settings.ENV.get('GOPATH') != '' and self.settings.ENV.get('GOPATH'):
 			for gopath_loc in self.settings.ENV['GOPATH'].split(os.pathsep):
 				self.settings.ENV['PATH'] += os.pathsep + os.path.join(gopath_loc, 'bin')
-			return godefinfo_auto_install(self.settings.GOBIN, self.settings.ENV)
+			return godefinfo_auto_install(self.settings.GOBIN, self.settings.ENV, godefinfo_update)
 		else:
 			log_output("[settings] Cannot find GOPATH, notifying error API.")
 			return ExportedParams(Error=ERR_GOPATH_UNDEFINED.title, Fix=ERR_GOPATH_UNDEFINED.description)
@@ -379,8 +379,11 @@ class ExportedParams(object):
 		return self.to_json()
 
 
-def godefinfo_auto_install(gobin, env):
-	godefinfo_install_command = [gobin, 'get', '-u', 'github.com/sqs/godefinfo']
+def godefinfo_auto_install(gobin, env, godefinfo_update):
+	if godefinfo_update:
+		godefinfo_install_command = [gobin, 'get', '-u', 'github.com/sqs/godefinfo']
+	else:
+		godefinfo_install_command = [gobin, 'get', 'github.com/sqs/godefinfo']
 	log_output('[godefinfo] Settings reloaded, installing godefinfo: %s' % ' '.join(godefinfo_install_command))
 	out, err, return_code = run_shell_command(godefinfo_install_command, env)
 	if return_code != 0:
