@@ -24,8 +24,8 @@ def find_gopath_from_gosublime():
 
 
 def load_settings(settings):
+	sourcegraph_lib.SG_LOG_FILE = '/tmp/sourcegraph-sublime.log'
 	sg_settings = sourcegraph_lib.Settings()
-
 	if settings.has('LOG_LEVEL'):
 		sourcegraph_lib.LOG_LEVEL = settings.get('LOG_LEVEL')
 		sourcegraph_lib.log_output('[settings] Found logging setting in Settings file: %s' % sourcegraph_lib.LOG_LEVEL)
