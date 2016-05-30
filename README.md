@@ -34,7 +34,7 @@ git clone https://github.com/sourcegraph/sourcegraph-sublime.git
 
 ## Usage
 
-Sourcegraph for Sublime opens a channel in your browser to initialize your Sourcegraph session when in Go files. If, for any reason, your channel gets closed, you can click on `Sublime Text > Preferences > Package Settings > Sourcegraph > Reopen Channel`. As you navigate through Go files, press <kbd>ctrl</kbd><kbd>alt</kbd><kbd>j</kbd> when your cursor is on a symbol to load its definition and references across thousands of public Go repositories.
+Sourcegraph for Sublime opens a channel in your browser to initialize your Sourcegraph session when in Go files. As you navigate through Go files, press <kbd>ctrl</kbd><kbd>alt</kbd><kbd>j</kbd> when your cursor is on a symbol to load its definition and references across thousands of public Go repositories.
 
 ## Flags
 
