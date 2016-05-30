@@ -69,11 +69,6 @@
 							},
 							{ "caption": "-" },
 							{
-								"caption": "Reopen Channel",
-								"command": "sg_open_channel",
-							},
-							{ "caption": "-" },
-							{
 								"caption": "Open Log File",
 								"command": "sg_open_log",
 							}

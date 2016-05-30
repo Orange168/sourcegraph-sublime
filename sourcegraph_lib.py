@@ -10,10 +10,10 @@ import time
 from threading import Thread
 try:
 	from urllib.request import Request, urlopen
-	from urllib.error import HTTPError
+	from urllib.error import HTTPError, URLError
 except:
 	from urllib2 import Request, urlopen
-	from urllib2 import HTTPError
+	from urllib2 import HTTPError, URLError
 
 LOG_NONE = 0
 LOG_SYMBOLS = 1
@@ -21,9 +21,7 @@ LOG_NETWORK = 2
 LOG_ALL = 3
 
 LOG_LEVEL = LOG_NONE
-SG_LOG_FILE = '/tmp/sourcegraph-sublime.log'
-SG_CHANNEL = None
-
+SG_LOG_FILE = '/tmp/sourcegraph-editor.log'
 
 class Error(object):
 	def __init__(self, title, description):
@@ -124,15 +122,12 @@ class Sourcegraph(object):
 	def __init__(self, settings):
 		super(Sourcegraph, self).__init__()
 		self.IS_OPENING_CHANNEL = False
-		self.HAVE_OPENED_CHANNEL = False
 		self.EXPORTED_PARAMS_CACHE = None
 		self.settings = settings
 
-		# Thread that checks the state of the variable every couple of milliseconds seconds
-
-	def post_load(self):
+	def post_load(self, godefinfo_update=True):
 		setup_logging()
-		error_loading = self.add_gopath_to_path()
+		error_loading = self.add_gopath_to_path(godefinfo_update)
 		if type(error_loading) is ExportedParams:
 			self.send_curl_request(error_loading)
 		log_output('[settings] env: %s' % str(self.settings.ENV))
@@ -188,32 +183,31 @@ class Sourcegraph(object):
 		if self.EXPORTED_PARAMS_CACHE == exported_params:
 			return
 		self.EXPORTED_PARAMS_CACHE = exported_params
-		if not self.HAVE_OPENED_CHANNEL:
-			self.open_channel()
-			self.HAVE_OPENED_CHANNEL = True
-		post_url = '%s/.api/channel/%s' % (self.settings.SG_SEND_URL, SG_CHANNEL)
-		self.send_curl_request_network(post_url, exported_params.to_json())
-
-	def send_curl_request_network(self, post_url, json_arguments):
-		t = Thread(target=self.send_def_info, args=[post_url, json_arguments])
+		post_url = '%s/.api/channel/%s' % (self.settings.SG_SEND_URL, self.settings.SG_CHANNEL)
+		log_output('[network] Sending post request params: %s' % str(exported_params.to_json()), is_network=True)
+		log_output('[network] Sending POST request to URL: %s' % post_url, is_network=True)
+		req = Request(post_url, exported_params.to_json().encode('utf-8'), {'Content-Type': 'application/json'})
+		t = Thread(target=self.send_curl_request_network, args=[req])
 		t.start()
 
-	def send_def_info(self, post_url, json_arguments):
-		log_output('[network] Sending post request params: %s' % str(json_arguments), is_network=True)
-		log_output('[network] Sending POST request to URL: %s' % post_url, is_network=True)
+	def try_send(self, req):
+		f = urlopen(req)
+		status_code = f.getcode()
+		log_output('[network] Server responded with code %s' % str(status_code), is_network=True)
+		f.close()
+
+	def send_curl_request_network(self, req):
 		try:
-			req = Request(post_url, json_arguments.encode('utf-8'), {'Content-Type': 'application/json'})
-			f = urlopen(req)
-			status_code = f.getcode()
-			log_output('[network] Server responded with code %s' % str(status_code), is_network=True)
-			f.close()
+			self.try_send(req)
 		except HTTPError as err:
 			if not self.IS_OPENING_CHANNEL:
 				self.IS_OPENING_CHANNEL = True
 				log_output('[network] Server responded with err code %s, reopening browser.' % str(err.code), is_network=True)
-				self.open_channel(hard_refresh=True)
-				self.send_curl_request_network(post_url, json_arguments)
-				time.sleep(2)
+				self.open_channel()
+				try:
+					self.try_send(req)
+				except Exception as err:
+					log_output('[network] curl request failed twice, aborting. %s' % str(err), is_network=True)
 				self.IS_OPENING_CHANNEL = False
 		except URLError as err:
 			log_output('[network] Bad POST URL: %s' % str(err))
@@ -221,8 +215,7 @@ class Sourcegraph(object):
 			log_output('[network] Unexpected exception: %s' % str(err))
 
 	def open_channel_os(self):
-		get_channel()
-		command = ['%s/-/channel/%s' % (self.settings.SG_BASE_URL, SG_CHANNEL)]
+		command = ['%s/-/channel/%s' % (self.settings.SG_BASE_URL, self.settings.SG_CHANNEL)]
 		if sys.platform.startswith('linux'):
 			command.insert(0, 'xdg-open')
 		elif sys.platform == 'darwin':
@@ -237,10 +230,8 @@ class Sourcegraph(object):
 
 	def open_channel(self, hard_refresh=False):
 		if hard_refresh:
-			self.HAVE_OPENED_CHANNEL = True
 			self.EXPORTED_PARAMS_CACHE = None
-			global SG_CHANNEL
-			SG_CHANNEL = None
+			self.settings.SG_CHANNEL = None
 
 		self.open_channel_os()
 
@@ -263,7 +254,7 @@ class Sourcegraph(object):
 			stderr = b'FileNotFoundError'
 		return stderr, godefinfo_output
 
-	def add_gopath_to_path(self):
+	def add_gopath_to_path(self, godefinfo_update=True):
 		gopath_err = check_gopath(self.settings.ENV)
 		if gopath_err:
 			return gopath_err
@@ -273,19 +264,15 @@ class Sourcegraph(object):
 		if self.settings.ENV.get('GOPATH') != '' and self.settings.ENV.get('GOPATH'):
 			for gopath_loc in self.settings.ENV['GOPATH'].split(os.pathsep):
 				self.settings.ENV['PATH'] += os.pathsep + os.path.join(gopath_loc, 'bin')
-			return godefinfo_auto_install(self.settings.GOBIN, self.settings.ENV)
+			return godefinfo_auto_install(self.settings.GOBIN, self.settings.ENV, godefinfo_update)
 		else:
 			log_output("[settings] Cannot find GOPATH, notifying error API.")
 			return ExportedParams(Error=ERR_GOPATH_UNDEFINED.title, Fix=ERR_GOPATH_UNDEFINED.description)
 
-def get_channel():
-	global SG_CHANNEL
-	if SG_CHANNEL is None:
-		SG_CHANNEL = '%s-%06x%06x%06x%06x%06x%06x' % \
-			(get_user_name(), random.randrange(16**6), random.randrange(16**6),
-				random.randrange(16**6), random.randrange(16**6), random.randrange(16**6), random.randrange(16**6))
-	else:
-		log_output('Using existing channel: %s' % SG_CHANNEL)
+def generate_channel_id():
+	return '%s-%06x%06x%06x%06x%06x%06x' % \
+		(get_user_name(), random.randrange(16**6), random.randrange(16**6),
+			random.randrange(16**6), random.randrange(16**6), random.randrange(16**6), random.randrange(16**6))
 
 
 class LookupArgs(object):
@@ -335,6 +322,7 @@ class Settings(object):
 		self.AUTO = False
 		self.ENABLE_LOOKBACK = True
 		self.GOBIN = find_gobin(self.ENV.get('SHELL'))
+		self.SG_CHANNEL = generate_channel_id()
 		self.__dict__.update(kwds)
 
 	def __str__(self):
@@ -391,8 +379,11 @@ class ExportedParams(object):
 		return self.to_json()
 
 
-def godefinfo_auto_install(gobin, env):
-	godefinfo_install_command = [gobin, 'get', '-u', 'github.com/sqs/godefinfo']
+def godefinfo_auto_install(gobin, env, godefinfo_update):
+	if godefinfo_update:
+		godefinfo_install_command = [gobin, 'get', '-u', 'github.com/sqs/godefinfo']
+	else:
+		godefinfo_install_command = [gobin, 'get', 'github.com/sqs/godefinfo']
 	log_output('[godefinfo] Settings reloaded, installing godefinfo: %s' % ' '.join(godefinfo_install_command))
 	out, err, return_code = run_shell_command(godefinfo_install_command, env)
 	if return_code != 0:
