@@ -39,9 +39,7 @@ ERR_GODEFINFO_INSTALL = Error('godefinfo binary not found', 'We could not find g
 ERR_GO_BINARY = Error('Go binary not found in your PATH', 'We could not find a Go binary in your PATH. Please read the GOBIN section in the Sourcegraph Sublime README to learn how to manually set your GOBIN.')
 ERR_GO_VERSION = Error('Go version is < 1.6', 'Sourcegraph Sublime only works with Go 1.6 and greater. Please install Go 1.6.')
 ERR_UNRECOGNIZED_SHELL = Error('Sourcegraph for Sublime can\'t execute commands against your shell', 'Contact Sourcegraph with your OS details, and we\'ll try to deliver Sourcegraph for your OS.')
-
-def ERR_SYMBOL_NOT_FOUND(symbol):
-	return Error('Could not find symbol "%s".' % symbol, 'Please make sure you have selected a valid symbol, and have all imported packages installed on your computer.')
+ERR_GODEFINFO_INVALID = Error('godefinfo is not returning valid output', 'Please make sure you have selected a valid symbol, and have all imported packages installed on your computer.')
 
 def is_windows():
 	return os.name == 'nt'
@@ -145,8 +143,6 @@ class Sourcegraph(object):
 		return_object = self.get_sourcegraph_request(lookup_args.filename, lookup_args.cursor_offset, lookup_args.preceding_selection, lookup_args.selected_token)
 		if return_object:
 			self.send_curl_request(return_object)
-		elif not self.settings.AUTO:
-			self.send_curl_request(ExportedParams(Error=ERR_SYMBOL_NOT_FOUND(lookup_args.selected_token).title, Fix=ERR_SYMBOL_NOT_FOUND(lookup_args.selected_token).description, Status=STATUS_BAD))
 
 	def get_sourcegraph_request(self, filename, cursor_offset, preceding_selection, selected_token):
 		if self.settings.ENV.get('GOPATH') == '':
@@ -157,13 +153,13 @@ class Sourcegraph(object):
 			return ExportedParams(Error=ERR_GODEFINFO_INSTALL.title, Fix=ERR_GODEFINFO_INSTALL.description, Status=STATUS_BAD)
 		if stderr:
 			log_symbol_failure(reason=stderr)
-			return None
+			return ExportedParams(Error=ERR_GODEFINFO_INVALID.title, Fix=ERR_GODEFINFO_INVALID.description, Status=STATUS_BAD)
 
 		godefinfo_parsed = godefinfo_output
 
 		if godefinfo_parsed == '':
 			log_symbol_failure(reason='[godefinfo] godefinfo returned nothing.')
-			return None
+			return ExportedParams(Error=ERR_GODEFINFO_INVALID.title, Fix=ERR_GODEFINFO_INVALID.description, Status=STATUS_BAD)
 
 		symbol_name = None
 
