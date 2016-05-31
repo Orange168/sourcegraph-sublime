@@ -42,7 +42,7 @@ def load_settings(settings):
 	sourcegraph_lib.SG_LOG_FILE = '/tmp/sourcegraph-sublime.log'
 	sourcegraph_lib.ERROR_CALLBACK = error_callback
 	sourcegraph_lib.SUCCESS_CALLBACK = success_callback
-	sg_settings = sourcegraph_lib.Settings()
+	sg_settings = sourcegraph_lib.Settings(EditorType="sublime")
 	if settings.has('LOG_LEVEL'):
 		sourcegraph_lib.LOG_LEVEL = settings.get('LOG_LEVEL')
 		sourcegraph_lib.log_output('[settings] Found logging setting in Settings file: %s' % sourcegraph_lib.LOG_LEVEL)
