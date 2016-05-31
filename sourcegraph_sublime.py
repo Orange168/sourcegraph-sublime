@@ -22,13 +22,26 @@ def find_gopath_from_gosublime():
 			return gosubl_env['GOPATH'].replace('$HOME', sourcegraph_lib.get_home_path()).replace(':$GS_GOPATH', '')
 	return None
 
-def error_callback():
-	sublime.active_window().run_command("show_panel", {"panel": "console", "toggle": False})
+class SfprintCommand(sublime_plugin.TextCommand):
+	def run(self, edit, error_message):
+		self.view.insert(edit, self.view.size(), error_message)
+
+def error_callback(error_message):
+	sublime.active_window().destroy_output_panel('sg_errors')
+	error_panel = sublime.active_window().find_output_panel('sg_errors')
+	if not error_panel:
+		error_panel = sublime.active_window().create_output_panel('sg_errors')
+	sublime.active_window().run_command("show_panel", {"panel": "output.sg_errors", "toggle": False})
+	error_panel.run_command('sfprint', {"error_message": error_message})
 	return None
+
+def success_callback():
+	sublime.active_window().destroy_output_panel('sg_errors')
 
 def load_settings(settings):
 	sourcegraph_lib.SG_LOG_FILE = '/tmp/sourcegraph-sublime.log'
 	sourcegraph_lib.ERROR_CALLBACK = error_callback
+	sourcegraph_lib.SUCCESS_CALLBACK = success_callback
 	sg_settings = sourcegraph_lib.Settings()
 	if settings.has('LOG_LEVEL'):
 		sourcegraph_lib.LOG_LEVEL = settings.get('LOG_LEVEL')

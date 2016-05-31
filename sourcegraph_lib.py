@@ -16,6 +16,7 @@ except:
 	from urllib2 import HTTPError, URLError
 
 ERROR_CALLBACK = None
+SUCCESS_CALLBACK = None
 STATUS_BAD = 2
 STATUS_GOOD = 1
 
@@ -144,6 +145,8 @@ class Sourcegraph(object):
 		return_object = self.get_sourcegraph_request(lookup_args.filename, lookup_args.cursor_offset, lookup_args.preceding_selection, lookup_args.selected_token)
 		if return_object:
 			self.send_curl_request(return_object)
+			if SUCCESS_CALLBACK:
+				SUCCESS_CALLBACK()
 
 	def get_sourcegraph_request(self, filename, cursor_offset, preceding_selection, selected_token):
 		if self.settings.ENV.get('GOPATH') == '':
@@ -406,7 +409,7 @@ def log_symbol_failure(reason=None):
 
 def log_major_failure(error_callback, text):
 	if error_callback:
-		error_callback()
+		error_callback(text)
 	logging.error(text)
 
 def log_output(output, log_type='debug', is_symbol=False, is_network=False):
