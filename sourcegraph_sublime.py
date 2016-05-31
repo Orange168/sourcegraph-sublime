@@ -22,9 +22,13 @@ def find_gopath_from_gosublime():
 			return gosubl_env['GOPATH'].replace('$HOME', sourcegraph_lib.get_home_path()).replace(':$GS_GOPATH', '')
 	return None
 
+def error_callback():
+	sublime.active_window().run_command("show_panel", {"panel": "console", "toggle": False})
+	return None
 
 def load_settings(settings):
 	sourcegraph_lib.SG_LOG_FILE = '/tmp/sourcegraph-sublime.log'
+	sourcegraph_lib.ERROR_CALLBACK = error_callback
 	sg_settings = sourcegraph_lib.Settings()
 	if settings.has('LOG_LEVEL'):
 		sourcegraph_lib.LOG_LEVEL = settings.get('LOG_LEVEL')
@@ -94,7 +98,6 @@ def process_selection(view):
 		return
 	args = sourcegraph_lib.LookupArgs(filename=view.file_name(), cursor_offset=cursor_offset(view), preceding_selection=str.encode(view.substr(sublime.Region(0, view.size()))), selected_token=view.substr(view.extract_scope(view.sel()[0].begin())))
 	SG_LIB_INSTANCE.on_selection_modified_handler(args)
-
 
 class SgOpenLogCommand(sublime_plugin.WindowCommand):
 	def run(self):

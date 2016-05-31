@@ -15,6 +15,7 @@ except:
 	from urllib2 import Request, urlopen
 	from urllib2 import HTTPError, URLError
 
+ERROR_CALLBACK = None
 STATUS_BAD = 2
 STATUS_GOOD = 1
 
@@ -138,8 +139,8 @@ class Sourcegraph(object):
 			return None
 		validate_output = validate_settings(self.settings)
 		if validate_output:
-			self.send_curl_request(ExportedParams(Error=validate_output.title, Fix=validate_output.description, Status=STATUS_BAD))
-			return
+			log_major_failure(ERROR_CALLBACK, "%s: %s" % (validate_output.title, validate_output.description))
+			return None
 		return_object = self.get_sourcegraph_request(lookup_args.filename, lookup_args.cursor_offset, lookup_args.preceding_selection, lookup_args.selected_token)
 		if return_object:
 			self.send_curl_request(return_object)
@@ -403,6 +404,10 @@ def log_symbol_failure(reason=None):
 	if reason:
 		log_output('Failed to find symbol. Reason: %s' % reason, is_symbol=True)
 
+def log_major_failure(error_callback, text):
+	if error_callback:
+		error_callback()
+	logging.error(text)
 
 def log_output(output, log_type='debug', is_symbol=False, is_network=False):
 	if LOG_LEVEL == LOG_ALL:
