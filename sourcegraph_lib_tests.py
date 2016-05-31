@@ -23,6 +23,7 @@ def start_default_instance():
 
 def check_output(test_case_class, test_output, expected_output):
     if expected_output is None:
+        print(test_output)
         test_case_class.assertIsNone(test_output)
         return
     test_case_class.assertEqual(expected_output, test_output)
@@ -114,7 +115,7 @@ class VerifyGoBinaryError(unittest.TestCase):
     def test(self):
         sourcegraph_lib_instance = start_default_instance()
         sourcegraph_lib_instance.settings.GOBIN = '/path/not/to/gobin'
-        test_output = sourcegraph_lib.godefinfo_auto_install(sourcegraph_lib_instance.settings.GOBIN, sourcegraph_lib_instance.settings.ENV, True)
+        test_output = sourcegraph_lib_instance.godefinfo_auto_install(sourcegraph_lib_instance.settings.GOBIN, sourcegraph_lib_instance.settings.ENV, True)
         self.assertEqual(test_output.Error, sourcegraph_lib.ERR_GO_BINARY.title)
         self.assertEqual(test_output.Fix, sourcegraph_lib.ERR_GO_BINARY.description)
 
@@ -161,6 +162,15 @@ class VerifyGoGetError(unittest.TestCase):
         test.expected_output = sourcegraph_lib.ExportedParams(Error=sourcegraph_lib.ERR_GO_GET(package_name).title, Fix=sourcegraph_lib.ERR_GO_GET(package_name).description)
         test_output = run_go_test(test, sourcegraph_lib_instance)
         check_output(self, test_output, test.expected_output)
+
+class VerifyNonGoSkipped(unittest.TestCase):
+    def test(self):
+        sourcegraph_lib_instance = start_default_instance()
+        lookup_args = sourcegraph_lib.LookupArgs(filename='not_go_file.py', cursor_offset='0', selected_token='not_go_file')
+        sourcegraph_lib_instance.send_curl_request = mock.Mock()
+        value = sourcegraph_lib_instance.on_selection_modified_handler(lookup_args)
+        sourcegraph_lib_instance.send_curl_request.assert_not_called()
+        self.assertIsNone(value)
 
 if __name__ == '__main__':
     unittest.main()
