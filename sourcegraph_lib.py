@@ -15,6 +15,9 @@ except:
 	from urllib2 import Request, urlopen
 	from urllib2 import HTTPError, URLError
 
+STATUS_BAD = 2
+STATUS_GOOD = 1
+
 LOG_NONE = 0
 LOG_SYMBOLS = 1
 LOG_NETWORK = 2
@@ -137,21 +140,21 @@ class Sourcegraph(object):
 			return None
 		validate_output = validate_settings(self.settings)
 		if validate_output:
-			self.send_curl_request(ExportedParams(Error=validate_output.title, Fix=validate_output.description))
+			self.send_curl_request(ExportedParams(Error=validate_output.title, Fix=validate_output.description, Status=STATUS_BAD))
 			return
 		return_object = self.get_sourcegraph_request(lookup_args.filename, lookup_args.cursor_offset, lookup_args.preceding_selection, lookup_args.selected_token)
 		if return_object:
 			self.send_curl_request(return_object)
 		elif not self.settings.AUTO:
-			self.send_curl_request(ExportedParams(Error=ERR_SYMBOL_NOT_FOUND(lookup_args.selected_token).title, Fix=ERR_SYMBOL_NOT_FOUND(lookup_args.selected_token).description))
+			self.send_curl_request(ExportedParams(Error=ERR_SYMBOL_NOT_FOUND(lookup_args.selected_token).title, Fix=ERR_SYMBOL_NOT_FOUND(lookup_args.selected_token).description, Status=STATUS_BAD))
 
 	def get_sourcegraph_request(self, filename, cursor_offset, preceding_selection, selected_token):
 		if self.settings.ENV.get('GOPATH') == '':
-			return ExportedParams(Error=ERR_GOPATH_UNDEFINED.title, Fix=ERR_GOPATH_UNDEFINED.description)
+			return ExportedParams(Error=ERR_GOPATH_UNDEFINED.title, Fix=ERR_GOPATH_UNDEFINED.description, Status=STATUS_BAD)
 
 		stderr, godefinfo_output = self.run_godefinfo(filename, cursor_offset, preceding_selection)
 		if stderr == b'FileNotFoundError':
-			return ExportedParams(Error=ERR_GODEFINFO_INSTALL.title, Fix=ERR_GODEFINFO_INSTALL.description)
+			return ExportedParams(Error=ERR_GODEFINFO_INSTALL.title, Fix=ERR_GODEFINFO_INSTALL.description, Status=STATUS_BAD)
 		if stderr:
 			log_symbol_failure(reason=stderr)
 			return None
@@ -177,7 +180,7 @@ class Sourcegraph(object):
 		else:
 			log_symbol_failure(reason='Unable to find symbol or repo_package')
 
-		return ExportedParams(Def=symbol_name, Repo=repo_package, Package=repo_package)
+		return ExportedParams(Def=symbol_name, Repo=repo_package, Package=repo_package, Status=STATUS_GOOD)
 
 	def send_curl_request(self, exported_params):
 		if self.EXPORTED_PARAMS_CACHE == exported_params:
@@ -267,7 +270,7 @@ class Sourcegraph(object):
 			return godefinfo_auto_install(self.settings.GOBIN, self.settings.ENV, godefinfo_update)
 		else:
 			log_output("[settings] Cannot find GOPATH, notifying error API.")
-			return ExportedParams(Error=ERR_GOPATH_UNDEFINED.title, Fix=ERR_GOPATH_UNDEFINED.description)
+			return ExportedParams(Error=ERR_GOPATH_UNDEFINED.title, Fix=ERR_GOPATH_UNDEFINED.description, Status=STATUS_BAD)
 
 def generate_channel_id():
 	return '%s-%06x%06x%06x%06x%06x%06x' % \
@@ -342,6 +345,7 @@ class ExportedParams(object):
 		self.Error = None
 		self.Fix = None
 		self.Type = None
+		self.Status = 2
 		self.__dict__.update(kwds)
 
 	def __eq__(self, other):
@@ -357,6 +361,8 @@ class ExportedParams(object):
 			if self.Fix != other.Fix:
 				return False
 			if self.Type != other.Type:
+				return False
+			if self.Status != other.Status:
 				return False
 			return True
 		else:
@@ -388,7 +394,7 @@ def godefinfo_auto_install(gobin, env, godefinfo_update):
 	out, err, return_code = run_shell_command(godefinfo_install_command, env)
 	if return_code != 0:
 		log_symbol_failure(reason='Godefinfo auto-install failure: %s' % str(err))
-		return ExportedParams(Error=ERR_GO_BINARY.title, Fix=ERR_GO_BINARY.description)
+		return ExportedParams(Error=ERR_GO_BINARY.title, Fix=ERR_GO_BINARY.description, Status=STATUS_BAD)
 	return None
 
 
