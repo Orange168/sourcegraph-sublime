@@ -22,10 +22,27 @@ def find_gopath_from_gosublime():
 			return gosubl_env['GOPATH'].replace('$HOME', sourcegraph_lib.get_home_path()).replace(':$GS_GOPATH', '')
 	return None
 
+class SfprintCommand(sublime_plugin.TextCommand):
+	def run(self, edit, error_message):
+		self.view.insert(edit, self.view.size(), error_message)
+
+def error_callback(error_message):
+	sublime.active_window().destroy_output_panel('sg_errors')
+	error_panel = sublime.active_window().find_output_panel('sg_errors')
+	if not error_panel:
+		error_panel = sublime.active_window().create_output_panel('sg_errors')
+	sublime.active_window().run_command("show_panel", {"panel": "output.sg_errors", "toggle": False})
+	error_panel.run_command('sfprint', {"error_message": error_message})
+	return None
+
+def success_callback():
+	sublime.active_window().destroy_output_panel('sg_errors')
 
 def load_settings(settings):
 	sourcegraph_lib.SG_LOG_FILE = '/tmp/sourcegraph-sublime.log'
-	sg_settings = sourcegraph_lib.Settings()
+	sourcegraph_lib.ERROR_CALLBACK = error_callback
+	sourcegraph_lib.SUCCESS_CALLBACK = success_callback
+	sg_settings = sourcegraph_lib.Settings(EditorType="sublime")
 	if settings.has('LOG_LEVEL'):
 		sourcegraph_lib.LOG_LEVEL = settings.get('LOG_LEVEL')
 		sourcegraph_lib.log_output('[settings] Found logging setting in Settings file: %s' % sourcegraph_lib.LOG_LEVEL)
@@ -90,11 +107,12 @@ def cursor_offset(view):
 
 
 def process_selection(view):
+	if not sourcegraph_lib.check_filetype(view.file_name()):
+		return
 	if len(view.sel()) == 0:
 		return
 	args = sourcegraph_lib.LookupArgs(filename=view.file_name(), cursor_offset=cursor_offset(view), preceding_selection=str.encode(view.substr(sublime.Region(0, view.size()))), selected_token=view.substr(view.extract_scope(view.sel()[0].begin())))
 	SG_LIB_INSTANCE.on_selection_modified_handler(args)
-
 
 class SgOpenLogCommand(sublime_plugin.WindowCommand):
 	def run(self):
