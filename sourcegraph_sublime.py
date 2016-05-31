@@ -107,6 +107,8 @@ def cursor_offset(view):
 
 
 def process_selection(view):
+	if not sourcegraph_lib.check_filetype(view.file_name()):
+		return
 	if len(view.sel()) == 0:
 		return
 	args = sourcegraph_lib.LookupArgs(filename=view.file_name(), cursor_offset=cursor_offset(view), preceding_selection=str.encode(view.substr(sublime.Region(0, view.size()))), selected_token=view.substr(view.extract_scope(view.sel()[0].begin())))

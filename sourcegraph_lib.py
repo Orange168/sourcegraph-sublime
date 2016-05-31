@@ -121,6 +121,11 @@ def run_native_shell_command(shell_env, command):
 		err = err.decode().strip()
 	return out, err, process.returncode
 
+def check_filetype(filename):
+	if filename is None or not filename.endswith('go'):
+		return False
+	return True
+
 class Sourcegraph(object):
 	def __init__(self, settings):
 		super(Sourcegraph, self).__init__()
@@ -136,7 +141,7 @@ class Sourcegraph(object):
 		log_output('[settings] env: %s' % str(self.settings.ENV))
 
 	def on_selection_modified_handler(self, lookup_args):
-		if lookup_args.filename is None or not lookup_args.filename.endswith('go'):
+		if not check_filetype:
 			return None
 		validate_output = validate_settings(self.settings)
 		if validate_output:
