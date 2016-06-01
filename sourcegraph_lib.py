@@ -17,7 +17,7 @@ except:
 
 ERROR_CALLBACK = None
 SUCCESS_CALLBACK = None
-STATUS_BAD = 2
+STATUS_BAD = 0
 STATUS_GOOD = 1
 
 LOG_NONE = 0
@@ -155,20 +155,20 @@ class Sourcegraph(object):
 
 	def get_sourcegraph_request(self, filename, cursor_offset, preceding_selection, selected_token):
 		if self.settings.ENV.get('GOPATH') == '':
-			return ExportedParams(Error=ERR_GOPATH_UNDEFINED.title, Fix=ERR_GOPATH_UNDEFINED.description, Status=STATUS_BAD, Version=self.settings.Version, EditorType=self.settings.EditorType)
+			return ExportedParams(Error=ERR_GOPATH_UNDEFINED.title, Fix=ERR_GOPATH_UNDEFINED.description, Status=STATUS_BAD, VersionMajor=self.settings.VersionMajor, VersionMinor=self.settings.VersionMinor, EditorType=self.settings.EditorType)
 
 		stderr, godefinfo_output = self.run_godefinfo(filename, cursor_offset, preceding_selection)
 		if stderr == b'FileNotFoundError':
-			return ExportedParams(Error=ERR_GODEFINFO_INSTALL.title, Fix=ERR_GODEFINFO_INSTALL.description, Status=STATUS_BAD, Version=self.settings.Version, EditorType=self.settings.EditorType)
+			return ExportedParams(Error=ERR_GODEFINFO_INSTALL.title, Fix=ERR_GODEFINFO_INSTALL.description, Status=STATUS_BAD, VersionMajor=self.settings.VersionMajor, VersionMinor=self.settings.VersionMinor, EditorType=self.settings.EditorType)
 		if stderr:
 			log_symbol_failure(reason=stderr)
-			return ExportedParams(Error=ERR_GODEFINFO_INVALID.title, Fix=ERR_GODEFINFO_INVALID.description, Status=STATUS_BAD, Version=self.settings.Version, EditorType=self.settings.EditorType)
+			return ExportedParams(Error=ERR_GODEFINFO_INVALID.title, Fix=ERR_GODEFINFO_INVALID.description, Status=STATUS_BAD, VersionMajor=self.settings.VersionMajor, VersionMinor=self.settings.VersionMinor, EditorType=self.settings.EditorType)
 
 		godefinfo_parsed = godefinfo_output
 
 		if godefinfo_parsed == '':
 			log_symbol_failure(reason='[godefinfo] godefinfo returned nothing.')
-			return ExportedParams(Error=ERR_GODEFINFO_INVALID.title, Fix=ERR_GODEFINFO_INVALID.description, Status=STATUS_BAD, Version=self.settings.Version, EditorType=self.settings.EditorType)
+			return ExportedParams(Error=ERR_GODEFINFO_INVALID.title, Fix=ERR_GODEFINFO_INVALID.description, Status=STATUS_BAD, VersionMajor=self.settings.VersionMajor, VersionMinor=self.settings.VersionMinor, EditorType=self.settings.EditorType)
 
 		symbol_name = None
 
@@ -185,7 +185,7 @@ class Sourcegraph(object):
 		else:
 			log_symbol_failure(reason='Unable to find symbol or repo_package')
 
-		return ExportedParams(Def=symbol_name, Repo=repo_package, Package=repo_package, Status=STATUS_GOOD, Version=self.settings.Version, EditorType=self.settings.EditorType)
+		return ExportedParams(Def=symbol_name, Repo=repo_package, Package=repo_package, Status=STATUS_GOOD, VersionMajor=self.settings.VersionMajor, VersionMinor=self.settings.VersionMinor, EditorType=self.settings.EditorType)
 
 	def send_curl_request(self, exported_params):
 		if self.EXPORTED_PARAMS_CACHE == exported_params:
@@ -275,7 +275,7 @@ class Sourcegraph(object):
 			return self.godefinfo_auto_install(self.settings.GOBIN, self.settings.ENV, godefinfo_update)
 		else:
 			log_output("[settings] Cannot find GOPATH, notifying error API.")
-			return ExportedParams(Error=ERR_GOPATH_UNDEFINED.title, Fix=ERR_GOPATH_UNDEFINED.description, Status=STATUS_BAD, Version=self.settings.Version, EditorType=self.settings.EditorType)
+			return ExportedParams(Error=ERR_GOPATH_UNDEFINED.title, Fix=ERR_GOPATH_UNDEFINED.description, Status=STATUS_BAD, VersionMajor=self.settings.VersionMajor, VersionMinor=self.settings.VersionMinor, EditorType=self.settings.EditorType)
 
 	def godefinfo_auto_install(self, gobin, env, godefinfo_update):
 		if godefinfo_update:
@@ -286,7 +286,7 @@ class Sourcegraph(object):
 		out, err, return_code = run_shell_command(godefinfo_install_command, env)
 		if return_code != 0:
 			log_symbol_failure(reason='Godefinfo auto-install failure: %s' % str(err))
-			return ExportedParams(Error=ERR_GO_BINARY.title, Fix=ERR_GO_BINARY.description, Status=STATUS_BAD, Version=self.settings.Version, EditorType=self.settings.EditorType)
+			return ExportedParams(Error=ERR_GO_BINARY.title, Fix=ERR_GO_BINARY.description, Status=STATUS_BAD, VersionMajor=self.settings.VersionMajor, VersionMinor=self.settings.VersionMinor, EditorType=self.settings.EditorType)
 		return None
 
 
@@ -326,7 +326,7 @@ class LookupArgs(object):
 	def to_json(self):
 		json_params = {}
 		for param in self.__dict__:
-			if self.__dict__[param]:
+			if self.__dict__[param] is not None:
 				json_params[param] = self.__dict__[param]
 		return json.dumps(json_params, ensure_ascii=False)
 
@@ -344,7 +344,8 @@ class Settings(object):
 		self.ENABLE_LOOKBACK = True
 		self.GOBIN = find_gobin(self.ENV.get('SHELL'))
 		self.SG_CHANNEL = generate_channel_id()
-		self.Version = .1
+		self.VersionMajor = 0
+		self.VersionMinor = 1
 		self.EditorType = "undefined"
 		self.__dict__.update(kwds)
 
@@ -365,8 +366,9 @@ class ExportedParams(object):
 		self.Error = None
 		self.Fix = None
 		self.Type = None
-		self.Status = 2
-		self.Version = 0.0
+		self.Status = STATUS_BAD
+		self.VersionMajor = 0
+		self.VersionMinor = 1
 		self.EditorType = "undefined"
 		self.__dict__.update(kwds)
 
@@ -399,7 +401,7 @@ class ExportedParams(object):
 	def to_json(self):
 		json_params = {'Action': {}, 'CheckForListeners': True}
 		for param in self.__dict__:
-			if self.__dict__[param]:
+			if self.__dict__[param] is not None:
 				json_params['Action'][param] = self.__dict__[param]
 		return json.dumps(json_params, ensure_ascii=False)
 
