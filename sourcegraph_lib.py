@@ -153,7 +153,8 @@ class Sourcegraph(object):
 			return_object = self.cache[cache_key]
 		else:
 			return_object = self.get_sourcegraph_request(lookup_args.filename, lookup_args.cursor_offset, lookup_args.preceding_selection, lookup_args.selected_token)
-			self.cache[cache_key] = return_object
+			if return_object and return_object.Error is None:
+				self.cache[cache_key] = return_object
 		if return_object:
 			self.send_curl_request(return_object)
 			if SUCCESS_CALLBACK:
