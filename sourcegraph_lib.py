@@ -1,5 +1,6 @@
 import json
 import logging
+from lookup_cache import LookupCache
 import os
 import random
 import subprocess
@@ -132,6 +133,7 @@ class Sourcegraph(object):
 		self.IS_OPENING_CHANNEL = False
 		self.EXPORTED_PARAMS_CACHE = None
 		self.settings = settings
+		self.cache = LookupCache(size_limit=50)
 
 	def post_load(self, godefinfo_update=True):
 		setup_logging()
@@ -140,14 +142,18 @@ class Sourcegraph(object):
 			self.send_curl_request(error_loading)
 		log_output('[settings] env: %s' % str(self.settings.ENV))
 
-	def on_selection_modified_handler(self, lookup_args):
-		if not check_filetype:
+	def on_selection_modified_handler(self, lookup_args, cache_key):
+		if not check_filetype(lookup_args.filename):
 			return None
 		validate_output = validate_settings(self.settings)
 		if validate_output:
 			log_major_failure(ERROR_CALLBACK, "%s: %s" % (validate_output.title, validate_output.description))
 			return None
-		return_object = self.get_sourcegraph_request(lookup_args.filename, lookup_args.cursor_offset, lookup_args.preceding_selection, lookup_args.selected_token)
+		if cache_key in self.cache:
+			return_object = self.cache[cache_key]
+		else:
+			return_object = self.get_sourcegraph_request(lookup_args.filename, lookup_args.cursor_offset, lookup_args.preceding_selection, lookup_args.selected_token)
+			self.cache[cache_key] = return_object
 		if return_object:
 			self.send_curl_request(return_object)
 			if SUCCESS_CALLBACK:
@@ -318,6 +324,12 @@ class CachedSymbolKey(object):
 		if result is NotImplemented:
 			return result
 		return not result
+
+	def __key(self):
+		return (self.filename, self.token_start, self.token_end)
+
+	def __hash__(self):
+		return hash(self.__key())
 
 class LookupArgs(object):
 	def __init__(self, filename, cursor_offset, selected_token, preceding_selection=None):

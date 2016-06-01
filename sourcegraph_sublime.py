@@ -2,8 +2,6 @@ import os
 import sys
 
 sys.path.append(os.path.dirname(__file__))
-# from lookup_cache import LookupCache
-
 import sourcegraph_lib
 
 import sublime
@@ -121,7 +119,7 @@ def process_selection(view):
 	LAST_SYMBOL_LOOKUP = cache_lookup_args
 
 	args = sourcegraph_lib.LookupArgs(filename=view.file_name(), cursor_offset=cursor_offset(view), preceding_selection=str.encode(view.substr(sublime.Region(0, view.size()))), selected_token=view.substr(view.extract_scope(view.sel()[0].begin())))
-	SG_LIB_INSTANCE.on_selection_modified_handler(args)
+	SG_LIB_INSTANCE.on_selection_modified_handler(args, cache_lookup_args)
 
 class SgOpenLogCommand(sublime_plugin.WindowCommand):
 	def run(self):
