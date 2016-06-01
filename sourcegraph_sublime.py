@@ -14,6 +14,10 @@ SUBLIME_VERSION = int(sublime.version())
 
 SG_LIB_INSTANCE = {}
 
+LAST_FILE = ""
+LAST_TOK_START = -1
+LAST_TOK_END = -1
+
 
 def find_gopath_from_gosublime():
 	if sublime.load_settings(GOSUBLIME_SETTINGS_FILENAME).has('env'):
@@ -105,12 +109,19 @@ def cursor_offset(view):
 	buffer_before = bytearray(string_before, encoding='utf8')
 	return str(len(buffer_before))
 
-
 def process_selection(view):
 	if not sourcegraph_lib.check_filetype(view.file_name()):
 		return
 	if len(view.sel()) == 0:
 		return
+	global LAST_FILE
+	global LAST_TOK_START
+	global LAST_TOK_END
+	if view.file_name() == LAST_FILE and LAST_TOK_START == view.extract_scope(view.sel()[0].begin()).a and LAST_TOK_END == view.extract_scope(view.sel()[0].begin()).b:
+		print("TRIGGERED")
+	LAST_FILE = view.file_name()
+	LAST_TOK_START = view.extract_scope(view.sel()[0].begin()).a
+	LAST_TOK_END = view.extract_scope(view.sel()[0].begin()).b
 	args = sourcegraph_lib.LookupArgs(filename=view.file_name(), cursor_offset=cursor_offset(view), preceding_selection=str.encode(view.substr(sublime.Region(0, view.size()))), selected_token=view.substr(view.extract_scope(view.sel()[0].begin())))
 	SG_LIB_INSTANCE.on_selection_modified_handler(args)
 
