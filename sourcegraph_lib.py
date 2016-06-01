@@ -5,6 +5,7 @@ from lookup_cache import LookupCache
 
 import json
 import logging
+
 import random
 import subprocess
 import time
@@ -447,6 +448,10 @@ class ExportedParams(object):
 		return self.to_json()
 
 def setup_logging():
+	root = logging.getLogger()
+	if root.handlers:
+		for handler in root.handlers:
+			root.removeHandler(handler)
 	logging.basicConfig(filename=SG_LOG_FILE, filemode='w', level=logging.DEBUG)
 	log_output('[settings] Set up logging to file %s' % SG_LOG_FILE)
 
