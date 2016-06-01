@@ -295,6 +295,29 @@ def generate_channel_id():
 		(get_user_name(), random.randrange(16**6), random.randrange(16**6),
 			random.randrange(16**6), random.randrange(16**6), random.randrange(16**6), random.randrange(16**6))
 
+class CachedSymbolKey(object):
+	def __init__(self, filename, token_start, token_end):
+		self.filename = filename
+		self.token_start = token_start
+		self.token_end = token_end
+
+	def __eq__(self, other):
+		if isinstance(other, CachedSymbolKey):
+			if self.filename != other.filename:
+				return False
+			if self.token_start != other.token_start:
+				return False
+			if self.token_end != other.token_end:
+				return False
+			return True
+		else:
+			return NotImplemented
+
+	def __ne__(self, other):
+		result = self.__eq__(other)
+		if result is NotImplemented:
+			return result
+		return not result
 
 class LookupArgs(object):
 	def __init__(self, filename, cursor_offset, selected_token, preceding_selection=None):

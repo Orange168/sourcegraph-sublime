@@ -2,6 +2,8 @@ import os
 import sys
 
 sys.path.append(os.path.dirname(__file__))
+# from lookup_cache import LookupCache
+
 import sourcegraph_lib
 
 import sublime
@@ -13,11 +15,7 @@ GOSUBLIME_SETTINGS_FILENAME = 'GoSublime.sublime-settings'
 SUBLIME_VERSION = int(sublime.version())
 
 SG_LIB_INSTANCE = {}
-
-LAST_FILE = ""
-LAST_TOK_START = -1
-LAST_TOK_END = -1
-
+LAST_SYMBOL_LOOKUP = None
 
 def find_gopath_from_gosublime():
 	if sublime.load_settings(GOSUBLIME_SETTINGS_FILENAME).has('env'):
@@ -114,15 +112,14 @@ def process_selection(view):
 		return
 	if len(view.sel()) == 0:
 		return
-	global LAST_FILE
-	global LAST_TOK_START
-	global LAST_TOK_END
-	if view.file_name() == LAST_FILE and LAST_TOK_START == view.extract_scope(view.sel()[0].begin()).a and LAST_TOK_END == view.extract_scope(view.sel()[0].begin()).b:
-		print("Saw same thing, ending")
+
+	cache_lookup_args = sourcegraph_lib.CachedSymbolKey(filename=view.file_name(), token_start=view.extract_scope(view.sel()[0].begin()).a, token_end=view.extract_scope(view.sel()[0].begin()).b)
+
+	global LAST_SYMBOL_LOOKUP
+	if cache_lookup_args == LAST_SYMBOL_LOOKUP:
 		return
-	LAST_FILE = view.file_name()
-	LAST_TOK_START = view.extract_scope(view.sel()[0].begin()).a
-	LAST_TOK_END = view.extract_scope(view.sel()[0].begin()).b
+	LAST_SYMBOL_LOOKUP = cache_lookup_args
+
 	args = sourcegraph_lib.LookupArgs(filename=view.file_name(), cursor_offset=cursor_offset(view), preceding_selection=str.encode(view.substr(sublime.Region(0, view.size()))), selected_token=view.substr(view.extract_scope(view.sel()[0].begin())))
 	SG_LIB_INSTANCE.on_selection_modified_handler(args)
 
