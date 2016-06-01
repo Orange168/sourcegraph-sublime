@@ -118,7 +118,8 @@ def process_selection(view):
 	global LAST_TOK_START
 	global LAST_TOK_END
 	if view.file_name() == LAST_FILE and LAST_TOK_START == view.extract_scope(view.sel()[0].begin()).a and LAST_TOK_END == view.extract_scope(view.sel()[0].begin()).b:
-		print("TRIGGERED")
+		print("Saw same thing, ending")
+		return
 	LAST_FILE = view.file_name()
 	LAST_TOK_START = view.extract_scope(view.sel()[0].begin()).a
 	LAST_TOK_END = view.extract_scope(view.sel()[0].begin()).b
