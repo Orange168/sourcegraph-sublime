@@ -1,10 +1,12 @@
+import os
+import sys
+sys.path.append(os.path.dirname(__file__))
+from lookup_cache import LookupCache
+
 import json
 import logging
-from lookup_cache import LookupCache
-import os
 import random
 import subprocess
-import sys
 import time
 
 
