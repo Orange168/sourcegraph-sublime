@@ -227,7 +227,7 @@ class Sourcegraph(object):
 					log_output('[network] curl request failed twice, aborting. %s' % str(err), is_network=True)
 				self.IS_OPENING_CHANNEL = False
 		except URLError as err:
-			log_output('[network] Bad POST URL: %s' % str(err))
+			log_major_failure(ERROR_CALLBACK, 'Unable to reach the Sourcegraph API.\nPlease check your internet connection and try again.\n\nError: %s' % str(err))
 		except Exception as err:
 			log_output('[network] Unexpected exception: %s' % str(err))
 
