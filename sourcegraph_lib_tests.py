@@ -127,6 +127,15 @@ class ValidateSettings(unittest.TestCase):
         if validation_output is not None:
             self.fail('Failed settings validation: %s' % validation_output.title)
 
+class VerifyLogFile(unittest.TestCase):
+    def test(self):
+        subprocess.call('rm -f %s' % sourcegraph_lib.SG_LOG_FILE, shell=True)
+        if os.path.isfile(sourcegraph_lib.SG_LOG_FILE):
+            self.fail('Log file prematurely created.')
+        settings = sourcegraph_lib.Settings()
+        sourcegraph_lib.Sourcegraph(settings).post_load()
+        if not os.path.isfile(sourcegraph_lib.SG_LOG_FILE):
+            self.fail('Log file not created.')
 
 class VerifyGodefinfoAutoUpdate(unittest.TestCase):
     def git_commit(self, git_dir):
