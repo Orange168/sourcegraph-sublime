@@ -1,7 +1,7 @@
 {
 	/*
 	This is where debugging information goes. To see debugging information in the
-	Sublime Console, set the "VERBOSE_LOGGING" setting to true.
+	Sublime Console, set the "LOG_LEVEL" flag in your settings.
 	*/
 	"SG_LOG_FILE": "/tmp/sourcegraph-sublime.log",
 

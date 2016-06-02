@@ -218,7 +218,7 @@ class Sourcegraph(object):
 					log_output('[network] curl request failed twice, aborting. %s' % str(err), is_network=True)
 				self.IS_OPENING_CHANNEL = False
 		except URLError as err:
-			log_major_failure(ERROR_CALLBACK, '[network] Bad POST URL: %s' % str(err))
+			log_major_failure(ERROR_CALLBACK, 'Unable to reach the Sourcegraph API.\nPlease check your internet connection and try again.\n\nError: %s' % str(err))
 		except Exception as err:
 			log_major_failure(ERROR_CALLBACK, '[network] Unexpected exception: %s' % str(err))
 
@@ -409,6 +409,10 @@ class ExportedParams(object):
 		return self.to_json()
 
 def setup_logging():
+	root = logging.getLogger()
+	if root.handlers:
+		for handler in root.handlers:
+			root.removeHandler(handler)
 	logging.basicConfig(filename=SG_LOG_FILE, filemode='w', level=logging.DEBUG)
 	log_output('[settings] Set up logging to file %s' % SG_LOG_FILE)
 

@@ -8,29 +8,9 @@ Sourcegraph for Sublime allows you to view Go definitions in real-time on [sourc
 
 ![Sourcegraph for Sublime](images/setup.jpg)
 
-## Setup
+## Installation
 
-To install Sourcegraph for Sublime, clone `sourcegraph-sublime` into your Sublime Text 3 Packages folder:
-
-OSX:
-
-```shell
-git clone https://github.com/sourcegraph/sourcegraph-sublime.git ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/sourcegraph-sublime
-```
-
-Linux:
-
-```shell
-git clone https://github.com/sourcegraph/sourcegraph-sublime.git ~/.config/sublime-text-3/Packages/sourcegraph-sublime
-```
-
-Windows:
-
-```shell
-cd %APPDATA%\Sublime Text 3\Packages
-git clone https://github.com/sourcegraph/sourcegraph-sublime.git
-```
-
+To install Sourcegraph for Sublime, please install the Sourcegraph package from [Package Control](https://packagecontrol.io/installation).
 
 ## Usage
 
@@ -46,7 +26,7 @@ To learn more about setting your `GOPATH`, please click [here](https://golang.or
 
 Sourcegraph for Sublime searches your shell to find `GOBIN`, the full path of your Go executable. This is typically `$GOROOT/bin/go`. Similarly, Sourcegraph loads your `/bin/bash` startup scripts to search for the `GOPATH` environment variable. If Sourcegraph cannot find your environment variables, or if you would like to use a custom `GOPATH` or `GOBIN`, add them in the settings file as follows:
 
-```yml
+```
 {
 	...
 	"GOPATH": "/path/to/gopath",
@@ -59,7 +39,7 @@ Sourcegraph for Sublime searches your shell to find `GOBIN`, the full path of yo
 
 When the `AUTO` flag is enabled, Sourcegraph automatically opens a live channel and shows references for your Go code as you type. If you want to disable this feature, set the `AUTO` flag to `false` in your settings file. If you set it to `false`, you must press <kbd>ctrl</kbd><kbd>alt</kbd><kbd>j</kbd> to update your Sourcegraph channel.
 
-```yml
+```
 {
 	...
 	"AUTO": true,
@@ -79,7 +59,7 @@ Log network calls: `2`
 
 Log all debugging information: `3`
 
-```yml
+```
 {
 	...
 	"LOG_LEVEL": 1,
@@ -99,12 +79,35 @@ go get -u github.com/sqs/godefinfo
 
 If you want to try Sourcegraph for Sublime on a local Sourcegraph server, you can define its base URL in this file using the key `SG_BASE_URL`.
 
-```yml
+```
 {
 	...
 	"SG_BASE_URL": "https://www.sourcegraph.com",
 	...
 }
+```
+
+## Alternative Installation
+
+If you prefer not to use Package Control, you can clone `sourcegraph-sublime` into your Sublime Text 3 Packages folder:
+
+OSX:
+
+```shell
+git clone https://github.com/sourcegraph/sourcegraph-sublime.git ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/sourcegraph-sublime
+```
+
+Linux:
+
+```shell
+git clone https://github.com/sourcegraph/sourcegraph-sublime.git ~/.config/sublime-text-3/Packages/sourcegraph-sublime
+```
+
+Windows:
+
+```shell
+cd %APPDATA%\Sublime Text 3\Packages
+git clone https://github.com/sourcegraph/sourcegraph-sublime.git
 ```
 
 ## Support
