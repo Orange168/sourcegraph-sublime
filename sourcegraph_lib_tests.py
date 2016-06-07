@@ -33,7 +33,7 @@ def full_test_filename(test_name, gopath):
     return os.path.join(gopath, 'src', 'github.com', 'luttig', 'sg-live-plugin-tests', 'go_tests', test_name)
 
 def run_go_test(test, sourcegraph_lib_instance):
-    full_filename = full_test_filename(test.lookup_args.filename, sourcegraph_lib_instance.settings.ENV['GOPATH'])
+    full_filename = full_test_filename(test.lookup_args.filename, sourcegraph_lib.get_gopaths(sourcegraph_lib_instance.settings.ENV['GOPATH'])[0])
     buff = b''
     if test.lookup_args.filename != '' and test.lookup_args.filename != '.go':
         try:
@@ -127,6 +127,17 @@ class ValidateSettings(unittest.TestCase):
         if validation_output is not None:
             self.fail('Failed settings validation: %s' % validation_output.title)
 
+class ValidateMultipleGopaths(unittest.TestCase):
+    def test(self):
+        syntax_tests = Tests()
+        sourcegraph_lib_instance = start_default_instance()
+        gopaths = [sourcegraph_lib_instance.settings.ENV['GOPATH'], sourcegraph_lib_instance.settings.ENV['GOPATH']]
+        sourcegraph_lib_instance.settings.ENV['GOPATH'] = os.pathsep.join(gopaths)
+        test = syntax_tests.PACKAGE_IMPORT
+        test_output = run_go_test(test, sourcegraph_lib_instance)
+        print(test_output)
+        print(test.expected_output)
+        check_output(self, test_output, test.expected_output)
 
 class VerifyGodefinfoAutoUpdate(unittest.TestCase):
     def git_commit(self, git_dir):

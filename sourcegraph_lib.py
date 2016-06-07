@@ -75,16 +75,23 @@ def shell_startup_info():
 	startup_info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 	return startup_info
 
+def get_gopaths(gopath_string):
+	formatted_gopath_list = list()
+	for gopath in gopath_string.split(os.pathsep):
+		formatted_gopath_list.append(gopath.rstrip(os.sep).strip())
+
+	return formatted_gopath_list
+
 def find_gopath_from_shell(shell):
 	if is_windows():
 		if os.environ.get('GOPATH') and os.environ.get('GOPATH') != '':
-			return os.environ.get('GOPATH').rstrip(os.sep).strip()
+			return get_gopaths(os.environ.get('GOPATH'))
 		else:
 			return None
 	else:
 		output, err, return_code = run_native_shell_command(shell, ['echo', '${GOPATH}'])
 		if return_code == 0:
-			return output.rstrip(os.sep).strip()
+			return get_gopaths(output)
 		else:
 			log_output('[settings] Could not find GOPATH from shell: %s' % str(err))
 			return None
@@ -244,9 +251,8 @@ class Sourcegraph(object):
 		self.open_channel_os()
 
 	def run_godefinfo(self, filename, cursor_offset, godefinfo_region):
-		godefinfo_args = [os.path.join(self.settings.ENV['GOPATH'], "bin", "godefinfo"), '-i', '-o', cursor_offset, '-f', filename]
+		godefinfo_args = ["godefinfo", '-i', '-o', cursor_offset, '-f', filename]
 		log_output('[godefinfo] Running shell command: %s' % ' '.join(godefinfo_args))
-
 		godefinfo_output = b''
 		stderr = None
 		try:
@@ -270,7 +276,7 @@ class Sourcegraph(object):
 		if go_err:
 			return go_err
 		if self.settings.ENV.get('GOPATH') != '' and self.settings.ENV.get('GOPATH'):
-			for gopath_loc in self.settings.ENV['GOPATH'].split(os.pathsep):
+			for gopath_loc in get_gopaths(self.settings.ENV['GOPATH']):
 				self.settings.ENV['PATH'] += os.pathsep + os.path.join(gopath_loc, 'bin')
 			return self.godefinfo_auto_install(self.settings.GOBIN, self.settings.ENV, godefinfo_update)
 		else:
@@ -475,10 +481,11 @@ def check_gopath(env):
 	if 'GOPATH' not in env:
 		return ERR_GOPATH_UNDEFINED
 
-	try:
-		os.listdir(env['GOPATH'])
-	except:
-		return ERR_GOPATH_UNDEFINED
+	for gopath in get_gopaths(env['GOPATH']):
+		try:
+			os.listdir(gopath)
+		except:
+			return ERR_GOPATH_UNDEFINED
 
 def check_go(settings):
 	# Check that we have access to the go binary
@@ -515,7 +522,7 @@ def validate_settings(settings):
 		return go_err
 
 	# Check that godefinfo is available
-	godefinfo_command = [os.path.join(settings.ENV['GOPATH'], 'bin', 'godefinfo'), '-v']
+	godefinfo_command = ['godefinfo', '-v']
 	out, err, return_code = run_shell_command(godefinfo_command, settings.ENV)
 	if return_code != 0:
 		return ERR_GODEFINFO_INSTALL

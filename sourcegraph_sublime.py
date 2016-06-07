@@ -58,12 +58,12 @@ def load_settings(settings):
 		sg_settings.AUTO = settings.get('AUTO')
 	if settings.has('GOBIN'):
 		sg_settings.GOBIN = settings.get('GOBIN').rstrip(os.sep)
-	shell_gopath = sourcegraph_lib.find_gopath_from_shell(sg_settings.ENV.get('SHELL'))
+	shell_gopaths = sourcegraph_lib.find_gopath_from_shell(sg_settings.ENV.get('SHELL'))
 	if settings.has('GOPATH'):
 		sg_settings.ENV['GOPATH'] = str(settings.get('GOPATH').rstrip(os.sep)).strip()
 		sourcegraph_lib.log_output('[settings] Using GOPATH found in Sublime settings file: %s' % sg_settings.ENV['GOPATH'])
-	elif shell_gopath and shell_gopath.rstrip(os.sep).strip() != '':
-		sg_settings.ENV['GOPATH'] = shell_gopath.rstrip(os.sep).strip()
+	elif shell_gopaths:
+		sg_settings.ENV['GOPATH'] = os.pathsep.join(shell_gopaths)
 		sourcegraph_lib.log_output('[settings] Using GOPATH from shell: %s' % sg_settings.ENV['GOPATH'])
 	elif find_gopath_from_gosublime():
 		sg_settings.ENV['GOPATH'] = find_gopath_from_gosublime()
