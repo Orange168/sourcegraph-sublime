@@ -135,8 +135,6 @@ class ValidateMultipleGopaths(unittest.TestCase):
         sourcegraph_lib_instance.settings.ENV['GOPATH'] = os.pathsep.join(gopaths)
         test = syntax_tests.PACKAGE_IMPORT
         test_output = run_go_test(test, sourcegraph_lib_instance)
-        print(test_output)
-        print(test.expected_output)
         check_output(self, test_output, test.expected_output)
 
 class VerifyGodefinfoAutoUpdate(unittest.TestCase):
