@@ -10,7 +10,7 @@ Sourcegraph for Sublime allows you to view Go definitions in real-time on [sourc
 
 ## Installation
 
-To install Sourcegraph for Sublime, please install the Sourcegraph package from [Package Control](https://packagecontrol.io/installation).
+To install Sourcegraph for Sublime, please install the Sourcegraph package from [Package Control](https://packagecontrol.io/packages/Sourcegraph).
 
 ## Usage
 
