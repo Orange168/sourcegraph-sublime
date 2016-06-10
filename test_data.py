@@ -23,7 +23,7 @@ class Tests(object):
 		self.IMPORTED_STRUCT = TestCase(lookup_args=LookupArgs(filename='imported_struct.go', cursor_offset='93', selected_token='Request'), expected_output=ExportedParams(Def='Request', Repo='net/http', Package='net/http', Status=sourcegraph_lib.STATUS_GOOD))
 		self.IMPORTED_STRUCT_FIELD = TestCase(lookup_args=LookupArgs(filename='imported_struct_field.go', cursor_offset='114', selected_token='Vars'), expected_output=ExportedParams(Def='RouteMatch/Vars', Repo='github.com/gorilla/mux', Package='github.com/gorilla/mux', Status=1))
 		self.LOCAL_FUNC = TestCase(lookup_args=LookupArgs(filename='local_func.go', cursor_offset='63', selected_token='helper('), expected_output=ExportedParams(Def='func_helper', Repo='github.com/luttig/sg-live-plugin-tests/go_tests', Package='github.com/luttig/sg-live-plugin-tests/go_tests', Status=sourcegraph_lib.STATUS_GOOD))
-		self.LOCAL_VAR = TestCase(lookup_args=LookupArgs(filename='local_var.go', cursor_offset='58', selected_token='test_var'), expected_output=ExportedParams(Error=sourcegraph_lib.ERR_GODEFINFO_INVALID.title, Fix=sourcegraph_lib.ERR_GODEFINFO_INVALID.description, Status=sourcegraph_lib.STATUS_BAD))
+		self.LOCAL_VAR = TestCase(lookup_args=LookupArgs(filename='local_var.go', cursor_offset='58', selected_token='test_var'), expected_output=None)
 
 	def syntax_tests(self):
 		all_tests = dict()

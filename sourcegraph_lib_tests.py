@@ -23,7 +23,6 @@ def start_default_instance():
 
 def check_output(test_case_class, test_output, expected_output):
     if expected_output is None:
-        print(test_output)
         test_case_class.assertIsNone(test_output)
         return
     test_case_class.assertEqual(expected_output, test_output)

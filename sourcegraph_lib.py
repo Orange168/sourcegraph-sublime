@@ -28,6 +28,8 @@ LOG_ALL = 3
 LOG_LEVEL = LOG_NONE
 SG_LOG_FILE = '/tmp/sourcegraph-editor.log'
 
+BUILTINS = frozenset(["string", "int", "uint8", "uint16", "uint32", "uint64", "int8", "int16", "int32", "int64", "float32", "float64", "complex64", "complex128", "byte", "rune", "uint", "uintptr"])
+
 class Error(object):
 	def __init__(self, title, description):
 		self.title = title
@@ -191,6 +193,10 @@ class Sourcegraph(object):
 			log_output('\nParams: {Symbol: %s, Repo/package: %s}' % (str(symbol_name), str(repo_package)), is_symbol=True)
 		else:
 			log_symbol_failure(reason='Unable to find symbol or repo_package')
+
+		if repo_package == "builtin" and selected_token not in BUILTINS and symbol_name in BUILTINS:
+			log_symbol_failure(reason="variable selected that is builtin")
+			return None
 
 		return ExportedParams(Def=symbol_name, Repo=repo_package, Package=repo_package, Status=STATUS_GOOD, VersionMajor=self.settings.VersionMajor, VersionMinor=self.settings.VersionMinor, EditorType=self.settings.EditorType)
 
