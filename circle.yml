@@ -19,4 +19,3 @@ test:
     - echo $PATH
     - go version
     - python sourcegraph_lib_tests.py
-    - docker run -it luttig/sg-zsh python3 /root/sourcegraph-sublime/sourcegraph_lib_tests.py
