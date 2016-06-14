@@ -3,10 +3,10 @@ import sys
 
 sys.path.append(os.path.dirname(__file__))
 import sourcegraph_lib
-
 import sublime
-
 import sublime_plugin
+
+from threading import Thread
 
 SETTINGS_FILENAME = 'Sourcegraph.sublime-settings'
 GOSUBLIME_SETTINGS_FILENAME = 'GoSublime.sublime-settings'
@@ -73,8 +73,7 @@ def load_settings(settings):
 
 	global SG_LIB_INSTANCE
 	SG_LIB_INSTANCE = sourcegraph_lib.Sourcegraph(sg_settings)
-	SG_LIB_INSTANCE.post_load()
-
+	Thread(target=SG_LIB_INSTANCE.post_load).start()
 
 def reload_settings():
 	old_base_url = SG_LIB_INSTANCE.settings.SG_BASE_URL
